@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nugas Mahasigma — Paan & Myla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF6F8;
+    --panel-paan: #FFE3ED;
+    --panel-myla: #FFD9E9;
+    --rose-deep: #C43E70;
+    --rose-mid: #E8558A;
+    --rose-soft: #FFB6CE;
+    --plum: #3E1F2E;
+    --plum-soft: #7A5064;
+    --line: rgba(62, 31, 46, 0.10);
+    --white: #FFFFFF;
+    --shadow-color: rgba(196, 62, 112, 0.18);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+    --mood-angry: #FF7A72;
+    --mood-neutral: #FFC9DF;
+    --mood-smile: #FFD98A;
+    --mood-happy: #FFCA4A;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    background: linear-gradient(160deg, #FFF6F8 0%, #FFE9F1 45%, #FFD8E8 100%);
+    background-attachment: fixed;
+    font-family: 'Manrope', sans-serif;
+    color: var(--plum);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  .backdrop-orb{
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .orb-1{ width: 420px; height: 420px; top: -160px; right: -120px; background: radial-gradient(circle, #FFC2DA 0%, transparent 70%); }
+  .orb-2{ width: 380px; height: 380px; bottom: -180px; left: -140px; background: radial-gradient(circle, #F79AC0 0%, transparent 70%); }
+
+  .page{
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  header.hero{
+    margin-bottom: 30px;
+    text-align: center;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    line-height: 1.05;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--plum);
+  }
+
+  .hero-sub{
+    position: relative;
+    font-size: 1.02rem;
+    color: var(--plum-soft);
+    max-width: 46ch;
+    margin: 16px 0 0;
+    line-height: 1.55;
+    min-height: 1.65em;
+  }
+
+  .motivation-text{
+    display: inline-block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .motivation-text.fading{
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  /* Tab switcher */
+  .tab-switch{
+    position: relative;
+    display: inline-flex;
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid rgba(255,255,255,0.7);
+    border-radius: 999px;
+    padding: 5px;
+    margin: 28px auto 0;
+    box-shadow: 0 10px 30px -14px var(--shadow-color);
+  }
+  .tab-thumb{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: calc(50% - 5px);
+    height: calc(100% - 10px);
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+  }
+  .tab-switch[data-active="myla"] .tab-thumb{ transform: translateX(100%); }
+
+  .tab-btn{
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--plum-soft);
+    padding: 11px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    transition: color 0.3s ease;
+  }
+  .tab-btn.active{ color: var(--white); }
+  .tab-btn .tab-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .tab-btn .tab-count{
+    font-size: 0.76rem;
+    opacity: 0.85;
+    font-weight: 800;
+  }
+
+  /* Board / carousel */
+  .board{
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 18px 50px -18px var(--shadow-color), 0 2px 8px rgba(62,31,46,0.06);
+  }
+  .board-track{
+    display:flex;
+    width: 200%;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .board[data-active="myla"] .board-track{ transform: translateX(-50%); }
+
+  .panel{
+    width: 50%;
+    flex-shrink: 0;
+    padding: 28px 26px 26px;
+    position: relative;
+    overflow: hidden;
+    display:flex;
+    flex-direction: column;
+    min-height: 440px;
+  }
+
+  .panel.paan{
+    background: linear-gradient(150deg, #FFEDF3 0%, var(--panel-paan) 60%, #FFCFE2 100%);
+  }
+  .panel.myla{
+    background: linear-gradient(150deg, #FFE7F1 0%, var(--panel-myla) 60%, #FFC3DE 100%);
+  }
+
+  .panel-glow{
+    position:absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, transparent 72%);
+    top: -80px;
+    right: -60px;
+    pointer-events:none;
+  }
+
+  .panel-header{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+    gap: 14px;
+  }
+
+  .owner-block{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+  }
+
+  .owner-name{
+    font-family:'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    margin: 0;
+    color: var(--plum);
+  }
+
+  .owner-meta{
+    font-size: 0.84rem;
+    color: var(--plum-soft);
+    margin-top: 3px;
+  }
+
+  .count-badge{
+    background: var(--white);
+    color: var(--rose-deep);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(196,62,112,0.15);
+    min-width: 34px;
+    text-align:center;
+  }
+
+  /* Mascot */
+  .mascot{
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .mascot-face{
+    width: 100%;
+    height: 100%;
+    display:block;
+    transition: transform 0.25s ease;
+  }
+  .face-bg{ fill: var(--mood-neutral); transition: fill 0.45s ease; }
+  .eye{ fill: var(--plum); transition: transform 0.25s ease; }
+  .cheek{ fill: #FF9EBA; opacity: 0; transition: opacity 0.4s ease; }
+  .brow{
+    stroke: var(--plum);
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, d 0.3s ease;
+  }
+  .mouth{
+    stroke: var(--plum);
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+    transition: d 0.35s ease;
+  }
+
+  .mascot.mood-neutral .face-bg{ fill: var(--mood-neutral); }
+  .mascot.mood-angry .face-bg{ fill: var(--mood-angry); }
+  .mascot.mood-smile .face-bg{ fill: var(--mood-smile); }
+  .mascot.mood-happy .face-bg{ fill: var(--mood-happy); }
+
+  .mascot.mood-angry .brow{ opacity: 1; }
+  .mascot.mood-happy .cheek{ opacity: 0.9; }
+
+  @keyframes mascot-shake{
+    0%,100%{ transform: translateX(0) rotate(0deg); }
+    25%{ transform: translateX(-1.5px) rotate(-3deg); }
+    75%{ transform: translateX(1.5px) rotate(3deg); }
+  }
+  .mascot.mood-angry .mascot-face{ animation: mascot-shake 0.45s ease-in-out infinite; }
+
+  @keyframes mascot-sway{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-3px) rotate(2deg); }
+  }
+  .mascot.mood-smile .mascot-face{ animation: mascot-sway 2.6s ease-in-out infinite; }
+
+  @keyframes mascot-bounce{
+    0%,100%{ transform: translateY(0) scale(1); }
+    30%{ transform: translateY(-7px) scale(1.06); }
+    55%{ transform: translateY(0) scale(0.96); }
+    75%{ transform: translateY(-2px) scale(1.02); }
+  }
+  .mascot.mood-happy .mascot-face{ animation: mascot-bounce 1.5s cubic-bezier(.36,1.4,.4,1) infinite; }
+
+  .sparkle{
+    position: absolute;
+    width: 8px; height: 8px;
+    top: 50%; left: 50%;
+    margin: -4px 0 0 -4px;
+    background: radial-gradient(circle, #FFF1B8 0%, #FFCA4A 70%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .mascot.celebrate .sparkle{ animation: sparkle-pop 0.9s ease-out forwards; }
+  .mascot.celebrate .sparkle:nth-child(1){ animation-delay: 0s; }
+  .mascot.celebrate .sparkle:nth-child(2){ animation-delay: 0.08s; }
+  .mascot.celebrate .sparkle:nth-child(3){ animation-delay: 0.16s; }
+  .mascot.celebrate .sparkle:nth-child(4){ animation-delay: 0.05s; }
+  .mascot.celebrate .sparkle:nth-child(5){ animation-delay: 0.12s; }
+  .mascot.celebrate .sparkle:nth-child(6){ animation-delay: 0.2s; }
+  @keyframes sparkle-pop{
+    0%{ opacity: 0; transform: translate(0,0) scale(0.3); }
+    35%{ opacity: 1; }
+    100%{ opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
+  }
+  .sparkle:nth-child(1){ --tx: -26px; --ty: -22px; }
+  .sparkle:nth-child(2){ --tx: 0px; --ty: -32px; }
+  .sparkle:nth-child(3){ --tx: 26px; --ty: -22px; }
+  .sparkle:nth-child(4){ --tx: -24px; --ty: 18px; }
+  .sparkle:nth-child(5){ --tx: 0px; --ty: 30px; }
+  .sparkle:nth-child(6){ --tx: 24px; --ty: 18px; }
+
+  .add-row{
+    display:flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .add-row input[type="text"]{
+    flex: 1;
+    border: 1.5px solid transparent;
+    background: rgba(255,255,255,0.75);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.96rem;
+    color: var(--plum);
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .add-row input[type="text"]::placeholder{ color: #B98098; }
+  .add-row input[type="text"]:focus{
+    border-color: var(--rose-mid);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(232,85,138,0.14);
+  }
+
+  .add-btn{
+    border: none;
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 0 22px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
+  }
+  .add-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+  .add-btn:active{ transform: translateY(0px) scale(0.97); }
+
+  /* Clear All Action Bar (Top) */
+  .clear-all-container {
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+  .clear-all-btn {
+    border: none;
+    background: rgba(196, 62, 112, 0.1);
+    color: var(--rose-deep);
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 0.81rem;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.25s ease;
+  }
+  .clear-all-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  .clear-all-btn:not(:disabled):hover {
+    background: var(--rose-deep);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(196,62,112,0.25);
+  }
+  .clear-all-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: rgba(62, 31, 46, 0.04);
+    color: var(--plum-soft);
+  }
+
+  /* Sections for Task Groups */
+  .task-section-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--plum-soft);
+    margin: 14px 0 6px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .task-section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  .task-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .task-item{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    background: rgba(255,255,255,0.72);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .task-item.clearing {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+
+  .task-item:hover{
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 4px 12px rgba(62,31,46,0.06);
+  }
+
+  .checkbox{
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--rose-soft);
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    background: var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .checkbox.checked{
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    border-color: var(--rose-deep);
+  }
+  .checkbox svg{
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+  }
+  .checkbox.checked svg{ opacity: 1; }
+
+  .task-text{
+    flex: 1;
+    font-size: 0.97rem;
+    line-height: 1.4;
+    color: var(--plum);
+    word-break: break-word;
+  }
+  .task-item.done .task-text{
+    color: #B591A2;
+    text-decoration: line-through;
+    text-decoration-color: #C99DB2;
+  }
+
+  .delete-btn{
+    border: none;
+    background: transparent;
+    color: #C08199;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition: background 0.15s ease, color 0.15s ease;
+    opacity: 0;
+  }
+  .task-item:hover .delete-btn,
+  .task-item:focus-within .delete-btn{ opacity: 1; }
+  .delete-btn:hover{ background: rgba(196,62,112,0.12); color: var(--rose-deep); }
+  .delete-btn svg{ width: 15px; height: 15px; }
+
+  .empty-state{
+    flex: 1;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 30px 10px;
+    color: var(--plum-soft);
+    position: relative;
+    z-index: 1;
+  }
+  .empty-state svg{ width: 46px; height: 46px; opacity: 0.55; margin-bottom: 12px; }
+  .empty-state p{ margin: 0; font-size: 0.92rem; max-width: 26ch; line-height: 1.5; }
+
+  ::selection{ background: var(--rose-soft); color: var(--plum); }
+</style>
+</head>
+<body>
+
+<div class="backdrop-orb orb-1"></div>
+<div class="backdrop-orb orb-2"></div>
+
+<div class="page">
+
+  <header class="hero">
+    <h1>Nugas Mahasigma</h1>
+    <p class="hero-sub"><span class="motivation-text" id="motivationText">Pilih daftar Paan atau Myla, tersimpan otomatis di setiap perangkat.</span></p>
+
+    <div class="tab-switch" id="tabSwitch" data-active="paan">
+      <div class="tab-thumb"></div>
+      <button type="button" class="tab-btn active" data-tab="paan">
+        <span class="tab-dot"></span> Paan List <span class="tab-count" id="tabCountPaan">0</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="myla">
+        <span class="tab-dot"></span> Myla List <span class="tab-count" id="tabCountMyla">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="board" id="board" data-active="paan">
+    <div class="board-track">
+
+      <section class="panel paan" aria-label="Daftar tugas Paan">
+        <div class="panel-glow"></div>
+        <div class="panel-header">
+          <div class="owner-block">
+            <div class="mascot mood-neutral" id="paanMascot" aria-hidden="true">
+              <svg class="mascot-face" viewBox="0 0 64 64">
+                <circle class="face-bg" cx="32" cy="32" r="30"/>
+                <path class="brow brow-l" id="paanBrowL" d="M15 20 L27 25"/>
+                <path class="brow brow-r" id="paanBrowR" d="M49 20 L37 25"/>
+                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
+                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
+                <path class="mouth" id="paanMouth" d="M23 40 Q32 40 41 40"/>
+              </svg>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+            </div>
+            <div>
+              <p class="owner-name">Paan</p>
+              <p class="owner-meta" id="paanMeta">Memuat tugas...</p>
+            </div>
+          </div>
+          <div class="count-badge" id="paanCount">0</div>
+        </div>
+        <form class="add-row" id="paanForm">
+          <input type="text" id="paanInput" placeholder="Tambah tugas untuk Paan" maxlength="140" autocomplete="off">
+          <button type="submit" class="add-btn">Tambah</button>
+        </form>
+        <div class="clear-all-container">
+          <button type="button" class="clear-all-btn" id="paanClearBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Hapus Semua Tugas
+          </button>
+        </div>
+        <div id="paanContainer"></div>
+      </section>
+
+      <section class="panel myla" aria-label="Daftar tugas Myla">
+        <div class="panel-glow"></div>
+        <div class="panel-header">
+          <div class="owner-block">
+            <div class="mascot mood-neutral" id="mylaMascot" aria-hidden="true">
+              <svg class="mascot-face" viewBox="0 0 64 64">
+                <circle class="face-bg" cx="32" cy="32" r="30"/>
+                <path class="brow brow-l" id="mylaBrowL" d="M15 20 L27 25"/>
+                <path class="brow brow-r" id="mylaBrowR" d="M49 20 L37 25"/>
+                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
+                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
+                <path class="mouth" id="mylaMouth" d="M23 40 Q32 40 41 40"/>
+              </svg>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+            </div>
+            <div>
+              <p class="owner-name">Myla</p>
+              <p class="owner-meta" id="mylaMeta">Memuat tugas...</p>
+            </div>
+          </div>
+          <div class="count-badge" id="mylaCount">0</div>
+        </div>
+        <form class="add-row" id="mylaForm">
+          <input type="text" id="mylaInput" placeholder="Tambah tugas untuk Myla" maxlength="140" autocomplete="off">
+          <button type="submit" class="add-btn">Tambah</button>
+        </form>
+        <div class="clear-all-container">
+          <button type="button" class="clear-all-btn" id="mylaClearBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Hapus Semua Tugas
+          </button>
+        </div>
+        <div id="mylaContainer"></div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+(function(){
+  const OWNERS = ['paan', 'myla'];
+  const STORAGE_KEY = 'tasklist:tasks';
+  const POLL_MS = 2500;
+
+  let state = { paan: [], myla: [] };
+  let lastKnownJSON = '';
+  let saveTimer = null;
+  let currentTab = 'paan';
+  const lastMood = { paan: 'neutral', myla: 'neutral' };
+
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  const els = {
+    paan: {
+      form: document.getElementById('paanForm'),
+      input: document.getElementById('paanInput'),
+      container: document.getElementById('paanContainer'),
+      clearBtn: document.getElementById('paanClearBtn'),
+      count: document.getElementById('paanCount'),
+      meta: document.getElementById('paanMeta'),
+      mascot: document.getElementById('paanMascot'),
+      mouth: document.getElementById('paanMouth'),
+      browL: document.getElementById('paanBrowL'),
+      browR: document.getElementById('paanBrowR'),
+      tabCount: document.getElementById('tabCountPaan')
+    },
+    myla: {
+      form: document.getElementById('mylaForm'),
+      input: document.getElementById('mylaInput'),
+      container: document.getElementById('mylaContainer'),
+      clearBtn: document.getElementById('mylaClearBtn'),
+      count: document.getElementById('mylaCount'),
+      meta: document.getElementById('mylaMeta'),
+      mascot: document.getElementById('mylaMascot'),
+      mouth: document.getElementById('mylaMouth'),
+      browL: document.getElementById('mylaBrowL'),
+      browR: document.getElementById('mylaBrowR'),
+      tabCount: document.getElementById('tabCountMyla')
+    }
+  };
+
+  const emptySVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4" stroke-opacity="0"/><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M8 16h5"/></svg>`;
+  const checkSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const trashSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+
+  const MOUTHS = {
+    angry: "M22 43 Q32 35 42 43",
+    neutral: "M23 40 Q32 40 41 40",
+    smile: "M21 35 Q32 46 43 35",
+    happy: "M18 32 Q32 50 46 32"
+  };
+  const BROWS = {
+    l: "M14 24 L27 20",
+    r: "M50 24 L37 20"
+  };
+
+  function moodFor(list){
+    const total = list.length;
+    if(total === 0) return 'neutral';
+    const done = list.filter(t => t.done).length;
+    const ratio = done / total;
+    if(ratio >= 1) return 'happy';
+    if(ratio >= 0.6) return 'smile';
+    return 'angry';
+  }
+
+  function updateMascot(owner, mood){
+    const el = els[owner];
+    el.mascot.classList.remove('mood-neutral', 'mood-angry', 'mood-smile', 'mood-happy');
+    el.mascot.classList.add('mood-' + mood);
+    el.mouth.setAttribute('d', MOUTHS[mood]);
+    if(mood === 'angry'){
+      el.browL.setAttribute('d', BROWS.l);
+      el.browR.setAttribute('d', BROWS.r);
+    }
+    if(mood === 'happy' && lastMood[owner] !== 'happy'){
+      el.mascot.classList.add('celebrate');
+      setTimeout(() => el.mascot.classList.remove('celebrate'), 950);
+    }
+    lastMood[owner] = mood;
+  }
+
+  function render(owner){
+    const list = state[owner] || [];
+    const el = els[owner];
+    const remaining = list.filter(t => !t.done).length;
+    el.count.textContent = remaining;
+    el.tabCount.textContent = remaining;
+    const doneCount = list.filter(t => t.done).length;
+    el.meta.textContent = list.length === 0
+      ? 'Belum ada tugas'
+      : `${list.length} tugas · ${doneCount} selesai`;
+
+    updateMascot(owner, moodFor(list));
+
+    const allDone = list.length > 0 && doneCount === list.length;
+    el.clearBtn.disabled = !allDone;
+
+    if(list.length === 0){
+      el.container.innerHTML = `<div class="empty-state">${emptySVG}<p>Belum ada tugas di sini. Tambahkan yang pertama di atas.</p></div>`;
+      return;
+    }
+
+    const uncompleted = list.filter(t => !t.done).sort((a,b) => a.createdAt - b.createdAt);
+    const completed = list.filter(t => t.done).sort((a,b) => a.createdAt - b.createdAt);
+
+    let html = '';
+
+    if(uncompleted.length > 0){
+      html += `<div class="task-section-title">Belum Selesai (${uncompleted.length})</div>`;
+      html += `<ul class="task-list">`;
+      uncompleted.forEach(task => {
+        html += `
+          <li class="task-item" data-id="${task.id}">
+            <div class="checkbox" role="checkbox" tabindex="0" aria-label="Tandai selesai">${checkSVG}</div>
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
+          </li>
+        `;
+      });
+      html += `</ul>`;
+    }
+
+    if(completed.length > 0){
+      html += `<div class="task-section-title">Sudah Selesai (${completed.length})</div>`;
+      html += `<ul class="task-list">`;
+      completed.forEach(task => {
+        html += `
+          <li class="task-item done" data-id="${task.id}">
+            <div class="checkbox checked" role="checkbox" tabindex="0" aria-label="Tandai belum selesai">${checkSVG}</div>
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
+          </li>
+        `;
+      });
+      html += `</ul>`;
+    }
+
+    el.container.innerHTML = html;
+
+    el.container.querySelectorAll('.task-item').forEach(li => {
+      const id = li.dataset.id;
+      li.querySelector('.checkbox').addEventListener('click', () => toggleTask(owner, id));
+      li.querySelector('.checkbox').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(owner, id); }
+      });
+      li.querySelector('.delete-btn').addEventListener('click', () => removeTask(owner, id));
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  function renderAll(){ OWNERS.forEach(render); }
+
+  async function loadFromStorage(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, true);
+      const json = result ? result.value : null;
+      if(json && json !== lastKnownJSON){
+        lastKnownJSON = json;
+        const parsed = JSON.parse(json);
+        state = {
+          paan: Array.isArray(parsed.paan) ? parsed.paan : [],
+          myla: Array.isArray(parsed.myla) ? parsed.myla : []
+        };
+        renderAll();
+      }
+    }catch(err){
+      // key may not exist yet
+    }
+  }
+
+  function saveToStorage(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try{
+        const json = JSON.stringify(state);
+        lastKnownJSON = json;
+        await window.storage.set(STORAGE_KEY, json, true);
+      }catch(err){
+        console.error('Storage save error:', err);
+      }
+    }, 250);
+  }
+
+  function addTask(owner, text){
+    const trimmed = text.trim();
+    if(!trimmed) return;
+    state[owner].push({ id: uid(), text: trimmed, done: false, createdAt: Date.now() });
+    render(owner);
+    saveToStorage();
+  }
+
+  function toggleTask(owner, id){
+    const task = state[owner].find(t => t.id === id);
+    if(!task) return;
+    task.done = !task.done;
+    render(owner);
+    saveToStorage();
+  }
+
+  function removeTask(owner, id){
+    state[owner] = state[owner].filter(t => t.id !== id);
+    render(owner);
+    saveToStorage();
+  }
+
+  function clearAllTasks(owner){
+    const items = els[owner].container.querySelectorAll('.task-item');
+    items.forEach(item => item.classList.add('clearing'));
+    setTimeout(() => {
+      state[owner] = [];
+      render(owner);
+      saveToStorage();
+    }, 380);
+  }
+
+  OWNERS.forEach(owner => {
+    els[owner].form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      addTask(owner, els[owner].input.value);
+      els[owner].input.value = '';
+      els[owner].input.focus();
+    });
+    els[owner].clearBtn.addEventListener('click', () => {
+      clearAllTasks(owner);
+    });
+  });
+
+  const tabSwitch = document.getElementById('tabSwitch');
+  const board = document.getElementById('board');
+  const tabButtons = tabSwitch.querySelectorAll('.tab-btn');
+
+  function setActiveTab(tab){
+    currentTab = tab;
+    tabSwitch.dataset.active = tab;
+    board.dataset.active = tab;
+    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+  });
+
+  renderAll();
+  loadFromStorage().then(() => {
+    setInterval(loadFromStorage, POLL_MS);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') loadFromStorage();
+  });
+
+  const motivationLines = [
+    'Pilih daftar Paan atau Myla, tersimpan otomatis di setiap perangkat.',
+    'Skripsi tidak akan selesai sendiri, tapi satu tugas selesai hari ini sudah kemajuan.',
+    'Deadline terasa dekat, tapi langkah kecil hari ini yang membawamu sampai di sana.',
+    'IPK tinggi dimulai dari to-do list yang dicoret satu per satu.',
+    'Bukan soal secepat apa, tapi soal seberapa konsisten kamu mencentang tugas.',
+    'Semester ini berat, tapi bukan berarti tidak bisa dilewati pelan-pelan.',
+    'Revisi dosen memang menyebalkan, tapi setiap revisi mendekatkanmu ke sidang.',
+    'Kerjakan yang bisa dikerjakan hari ini, sisanya urus besok dengan kepala lebih segar.',
+    'Kuliah sambil begadang boleh sesekali, tapi jangan lupa istirahat juga bagian dari produktif.',
+    'Satu tugas selesai lebih baik daripada sepuluh rencana yang tidak dimulai.'
+  ];
+
+  let motivationIndex = 0;
+  const motivationEl = document.getElementById('motivationText');
+
+  function rotateMotivation(){
+    motivationEl.classList.add('fading');
+    setTimeout(() => {
+      motivationIndex = (motivationIndex + 1) % motivationLines.length;
+      motivationEl.textContent = motivationLines[motivationIndex];
+      motivationEl.classList.remove('fading');
+    }, 550);
+  }
+
+  setInterval(rotateMotivation, 5200);
+})();
+</script>
+
+</body>
+</html>
