@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nugas Mahasigma — Paan & Myla</title>
+<title>Nugas Mahasigma — Paan & Mya</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --cream: #FFF6F8;
@@ -547,7 +550,7 @@
 
   <header class="hero">
     <h1>Nugas Mahasigma</h1>
-    <p class="hero-sub"><span class="motivation-text" id="motivationText">Pilih daftar Paan atau Myla, tersimpan otomatis di setiap perangkat.</span></p>
+    <p class="hero-sub"><span class="motivation-text" id="motivationText">Adaaa akuuu sayangggggg</span></p>
 
     <div class="tab-switch" id="tabSwitch" data-active="paan">
       <div class="tab-thumb"></div>
@@ -555,7 +558,7 @@
         <span class="tab-dot"></span> Paan List <span class="tab-count" id="tabCountPaan">0</span>
       </button>
       <button type="button" class="tab-btn" data-tab="myla">
-        <span class="tab-dot"></span> Myla List <span class="tab-count" id="tabCountMyla">0</span>
+        <span class="tab-dot"></span> Mya List <span class="tab-count" id="tabCountMyla">0</span>
       </button>
     </div>
   </header>
@@ -583,7 +586,7 @@
             </div>
             <div>
               <p class="owner-name">Paan</p>
-              <p class="owner-meta" id="paanMeta">Memuat tugas...</p>
+              <p class="owner-meta" id="paanMeta">Menghubungkan...</p>
             </div>
           </div>
           <div class="count-badge" id="paanCount">0</div>
@@ -621,7 +624,7 @@
             </div>
             <div>
               <p class="owner-name">Myla</p>
-              <p class="owner-meta" id="mylaMeta">Memuat tugas...</p>
+              <p class="owner-meta" id="mylaMeta">Menghubungkan...</p>
             </div>
           </div>
           <div class="count-badge" id="mylaCount">0</div>
@@ -646,19 +649,23 @@
 
 <script>
 (function(){
-  const OWNERS = ['paan', 'myla'];
-  const STORAGE_KEY = 'tasklist:tasks';
-  const POLL_MS = 2500;
+  // --- KONFIGURASI FIREBASE ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDikwxCVKGAbkwfJtAbjRwKBp1UpKjv35c",
+    authDomain: "nugas-myla-dan-paan.firebaseapp.com",
+    projectId: "nugas-myla-dan-paan",
+    storageBucket: "nugas-myla-dan-paan.firebasestorage.app",
+    messagingSenderId: "961202612580",
+    appId: "1:961202612580:web:7aadce1ac0da3c619d3271"
+  };
 
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const OWNERS = ['paan', 'myla'];
   let state = { paan: [], myla: [] };
-  let lastKnownJSON = '';
-  let saveTimer = null;
   let currentTab = 'paan';
   const lastMood = { paan: 'neutral', myla: 'neutral' };
-
-  function uid(){
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  }
 
   const els = {
     paan: {
@@ -802,45 +809,32 @@
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
 
-  function renderAll(){ OWNERS.forEach(render); }
-
-  async function loadFromStorage(){
-    try{
-      const result = await window.storage.get(STORAGE_KEY, true);
-      const json = result ? result.value : null;
-      if(json && json !== lastKnownJSON){
-        lastKnownJSON = json;
-        const parsed = JSON.parse(json);
-        state = {
-          paan: Array.isArray(parsed.paan) ? parsed.paan : [],
-          myla: Array.isArray(parsed.myla) ? parsed.myla : []
-        };
-        renderAll();
+  // --- REALTIME SYNC DENGAN FIRESTORE ---
+  OWNERS.forEach(owner => {
+    db.collection("tasks").doc(owner).onSnapshot((doc) => {
+      if (doc.exists) {
+        state[owner] = doc.data().items || [];
+      } else {
+        state[owner] = [];
       }
-    }catch(err){
-      // key may not exist yet
+      render(owner);
+    });
+  });
+
+  async function syncToFirebase(owner){
+    try {
+      await db.collection("tasks").doc(owner).set({ items: state[owner] });
+    } catch(err) {
+      console.error("Firebase sync error:", err);
     }
-  }
-
-  function saveToStorage(){
-    if(saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      try{
-        const json = JSON.stringify(state);
-        lastKnownJSON = json;
-        await window.storage.set(STORAGE_KEY, json, true);
-      }catch(err){
-        console.error('Storage save error:', err);
-      }
-    }, 250);
   }
 
   function addTask(owner, text){
     const trimmed = text.trim();
     if(!trimmed) return;
-    state[owner].push({ id: uid(), text: trimmed, done: false, createdAt: Date.now() });
+    state[owner].push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), text: trimmed, done: false, createdAt: Date.now() });
     render(owner);
-    saveToStorage();
+    syncToFirebase(owner);
   }
 
   function toggleTask(owner, id){
@@ -848,13 +842,13 @@
     if(!task) return;
     task.done = !task.done;
     render(owner);
-    saveToStorage();
+    syncToFirebase(owner);
   }
 
   function removeTask(owner, id){
     state[owner] = state[owner].filter(t => t.id !== id);
     render(owner);
-    saveToStorage();
+    syncToFirebase(owner);
   }
 
   function clearAllTasks(owner){
@@ -863,7 +857,7 @@
     setTimeout(() => {
       state[owner] = [];
       render(owner);
-      saveToStorage();
+      syncToFirebase(owner);
     }, 380);
   }
 
@@ -894,17 +888,9 @@
     btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
   });
 
-  renderAll();
-  loadFromStorage().then(() => {
-    setInterval(loadFromStorage, POLL_MS);
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible') loadFromStorage();
-  });
-
+  // Motivator rotation
   const motivationLines = [
-    'Pilih daftar Paan atau Myla, tersimpan otomatis di setiap perangkat.',
+    'Real-time sync otomatis antar perangkat via Firebase Firestore.',
     'Skripsi tidak akan selesai sendiri, tapi satu tugas selesai hari ini sudah kemajuan.',
     'Deadline terasa dekat, tapi langkah kecil hari ini yang membawamu sampai di sana.',
     'IPK tinggi dimulai dari to-do list yang dicoret satu per satu.',
