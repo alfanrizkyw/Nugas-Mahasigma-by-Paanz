@@ -6,399 +6,382 @@
 <title>Nugas Mahasigma — Paan & Mya</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 <style>
-  :root {
-    --radius-lg: 24px;
-    --radius-md: 14px;
-    --radius-sm: 10px;
-    --transition-smooth: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  /* --- MODE PAANZ (Dark Metallic & Clean Tech) --- */
-  body.mode-paan {
-    --bg-gradient: linear-gradient(135deg, #0b0c10 0%, #14161f 50%, #1a1d28 100%);
-    --panel-bg: linear-gradient(145deg, rgba(22, 25, 34, 0.9) 0%, rgba(13, 15, 20, 0.95) 100%);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --text-main: #f8fafc;
-    --text-soft: #94a3b8;
-    --accent-gradient: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-    --accent-shadow: rgba(255, 255, 255, 0.08);
-    --input-bg: rgba(255, 255, 255, 0.04);
-    --input-border: rgba(255, 255, 255, 0.1);
-    --task-bg: rgba(255, 255, 255, 0.03);
-    --task-hover: rgba(255, 255, 255, 0.06);
-    --badge-bg: rgba(255, 255, 255, 0.08);
-    --badge-text: #f8fafc;
-    --tab-bg: rgba(255, 255, 255, 0.05);
-    --tab-active-bg: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-    --tab-active-text: #0b0c10;
-    --checkbox-border: #64748b;
-    --checkbox-checked: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
-    
-    /* Kucing Hitam Paanz */
-    --cat-bg: #1e222d;
-    --cat-border: #333a4d;
-    --cat-eye: #f8fafc;
-    --cat-blush: rgba(255, 255, 255, 0.12);
-    --shadow-color: rgba(0, 0, 0, 0.5);
-  }
-
-  /* --- MODE MYLA (Soft Cute Pink) --- */
-  body.mode-myla {
-    --bg-gradient: linear-gradient(160deg, #FFF6F8 0%, #FFE9F1 45%, #FFD8E8 100%);
-    --panel-bg: linear-gradient(150deg, #FFE7F1 0%, #FFD9E9 60%, #FFC3DE 100%);
-    --panel-border: rgba(255, 255, 255, 0.6);
-    --text-main: #3E1F2E;
-    --text-soft: #7A5064;
-    --accent-gradient: linear-gradient(135deg, #E8558A, #C43E70);
-    --accent-shadow: rgba(196, 62, 112, 0.25);
-    --input-bg: rgba(255, 255, 255, 0.75);
-    --input-border: transparent;
-    --task-bg: rgba(255, 255, 255, 0.72);
-    --task-hover: rgba(255, 255, 255, 0.92);
-    --badge-bg: #FFFFFF;
-    --badge-text: #C43E70;
-    --tab-bg: rgba(255, 255, 255, 0.55);
-    --tab-active-bg: linear-gradient(135deg, #E8558A, #C43E70);
-    --tab-active-text: #FFFFFF;
-    --checkbox-border: #FFB6CE;
-    --checkbox-checked: linear-gradient(135deg, #E8558A, #C43E70);
-    
-    /* Kucing Putih Myla */
-    --cat-bg: #FFFFFF;
-    --cat-border: #FFB6CE;
-    --cat-eye: #3E1F2E;
-    --cat-blush: #FF9EBA;
+  :root{
+    --cream: #FFF6F8;
+    --panel-paan: #FFE3ED;
+    --panel-myla: #FFD9E9;
+    --rose-deep: #C43E70;
+    --rose-mid: #E8558A;
+    --rose-soft: #FFB6CE;
+    --plum: #3E1F2E;
+    --plum-soft: #7A5064;
+    --line: rgba(62, 31, 46, 0.10);
+    --white: #FFFFFF;
     --shadow-color: rgba(196, 62, 112, 0.18);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+    --mood-angry: #FF7A72;
+    --mood-neutral: #FFC9DF;
+    --mood-smile: #FFD98A;
+    --mood-happy: #FFCA4A;
   }
 
-  * { box-sizing: border-box; }
+  *{ box-sizing: border-box; }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    background: var(--bg-gradient);
+  html, body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    background: linear-gradient(160deg, #FFF6F8 0%, #FFE9F1 45%, #FFD8E8 100%);
     background-attachment: fixed;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: var(--text-main);
+    font-family: 'Manrope', sans-serif;
+    color: var(--plum);
     -webkit-font-smoothing: antialiased;
-    transition: background 0.5s ease, color 0.5s ease;
   }
 
-  .backdrop-orb {
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  .backdrop-orb{
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.35;
+    filter: blur(60px);
+    opacity: 0.5;
     z-index: 0;
     pointer-events: none;
-    transition: background 0.5s ease;
   }
-  .orb-1 { width: 400px; height: 400px; top: -120px; right: -100px; background: radial-gradient(circle, var(--text-soft) 0%, transparent 70%); }
-  .orb-2 { width: 400px; height: 400px; bottom: -120px; left: -100px; background: radial-gradient(circle, var(--text-soft) 0%, transparent 70%); }
+  .orb-1{ width: 420px; height: 420px; top: -160px; right: -120px; background: radial-gradient(circle, #FFC2DA 0%, transparent 70%); }
+  .orb-2{ width: 380px; height: 380px; bottom: -180px; left: -140px; background: radial-gradient(circle, #F79AC0 0%, transparent 70%); }
 
-  .page {
+  .page{
     position: relative;
     z-index: 1;
-    max-width: 680px;
+    max-width: 720px;
     margin: 0 auto;
-    padding: 32px 16px 60px;
+    padding: 56px 24px 80px;
   }
 
-  @media (min-width: 640px) {
-    .page { padding: 48px 24px 80px; }
-  }
-
-  header.hero {
-    margin-bottom: 24px;
+  header.hero{
+    margin-bottom: 30px;
     text-align: center;
-    display: flex;
+    display:flex;
     flex-direction: column;
     align-items: center;
   }
 
-  h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.8rem, 5vw, 2.6rem);
-    line-height: 1.1;
+  h1{
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    line-height: 1.05;
     margin: 0;
-    letter-spacing: -0.02em;
-    color: var(--text-main);
-    transition: color 0.4s ease;
+    letter-spacing: -0.01em;
+    color: var(--plum);
   }
 
-  .hero-sub {
-    font-size: 0.92rem;
-    color: var(--text-soft);
-    max-width: 44ch;
-    margin: 10px 0 0;
-    line-height: 1.5;
-    transition: color 0.4s ease;
+  .hero-sub{
+    position: relative;
+    font-size: 1.02rem;
+    color: var(--plum-soft);
+    max-width: 46ch;
+    margin: 16px 0 0;
+    line-height: 1.55;
+    min-height: 1.65em;
   }
 
-  /* Tab Switcher */
-  .tab-switch {
+  .motivation-text{
+    display: inline-block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .motivation-text.fading{
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  /* Tab switcher */
+  .tab-switch{
     position: relative;
     display: inline-flex;
-    background: var(--tab-bg);
-    border: 1.5px solid var(--panel-border);
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid rgba(255,255,255,0.7);
     border-radius: 999px;
-    padding: 4px;
-    margin: 24px auto 0;
-    box-shadow: 0 10px 30px -10px var(--shadow-color);
-    transition: var(--transition-smooth);
+    padding: 5px;
+    margin: 28px auto 0;
+    box-shadow: 0 10px 30px -14px var(--shadow-color);
   }
-  .tab-thumb {
+  .tab-thumb{
     position: absolute;
-    top: 4px;
-    left: 4px;
-    width: calc(50% - 4px);
-    height: calc(100% - 8px);
+    top: 5px;
+    left: 5px;
+    width: calc(50% - 5px);
+    height: calc(100% - 10px);
     border-radius: 999px;
-    background: var(--tab-active-bg);
-    box-shadow: 0 4px 15px var(--accent-shadow);
-    transition: var(--transition-smooth);
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 0;
   }
-  .tab-switch[data-active="myla"] .tab-thumb { transform: translateX(100%); }
+  .tab-switch[data-active="myla"] .tab-thumb{ transform: translateX(100%); }
 
-  .tab-btn {
+  .tab-btn{
     position: relative;
     z-index: 1;
     border: none;
     background: transparent;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Manrope', sans-serif;
     font-weight: 700;
-    font-size: 0.86rem;
-    color: var(--text-soft);
-    padding: 10px 22px;
+    font-size: 0.92rem;
+    color: var(--plum-soft);
+    padding: 11px 26px;
     border-radius: 999px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display:flex;
+    align-items:center;
+    gap: 8px;
     transition: color 0.3s ease;
   }
-  .tab-btn.active { color: var(--tab-active-text); }
-  .tab-btn .tab-count {
-    font-size: 0.72rem;
+  .tab-btn.active{ color: var(--white); }
+  .tab-btn .tab-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .tab-btn .tab-count{
+    font-size: 0.76rem;
     opacity: 0.85;
     font-weight: 800;
   }
 
-  /* Board Layout */
-  .board {
+  /* Board / carousel */
+  .board{
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 45px -15px var(--shadow-color);
-    border: 1px solid var(--panel-border);
-    transition: var(--transition-smooth);
+    box-shadow: 0 18px 50px -18px var(--shadow-color), 0 2px 8px rgba(62,31,46,0.06);
   }
-  .board-track {
-    display: flex;
+  .board-track{
+    display:flex;
     width: 200%;
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .board[data-active="myla"] .board-track { transform: translateX(-50%); }
+  .board[data-active="myla"] .board-track{ transform: translateX(-50%); }
 
-  .panel {
+  .panel{
     width: 50%;
     flex-shrink: 0;
-    padding: 20px 16px;
+    padding: 28px 26px 26px;
     position: relative;
     overflow: hidden;
-    display: flex;
+    display:flex;
     flex-direction: column;
-    min-height: 420px;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    transition: background 0.5s ease;
+    min-height: 440px;
   }
 
-  @media (min-width: 640px) {
-    .panel { padding: 28px; }
+  .panel.paan{
+    background: linear-gradient(150deg, #FFEDF3 0%, var(--panel-paan) 60%, #FFCFE2 100%);
+  }
+  .panel.myla{
+    background: linear-gradient(150deg, #FFE7F1 0%, var(--panel-myla) 60%, #FFC3DE 100%);
   }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
+  .panel-glow{
+    position:absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, transparent 72%);
+    top: -80px;
+    right: -60px;
+    pointer-events:none;
+  }
+
+  .panel-header{
+    display:flex;
+    align-items:center;
     justify-content: space-between;
     margin-bottom: 16px;
     position: relative;
     z-index: 1;
-    gap: 10px;
+    gap: 14px;
   }
 
-  .owner-block {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  .owner-block{
+    display:flex;
+    align-items:center;
+    gap: 14px;
   }
 
-  .owner-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 1.35rem;
+  .owner-name{
+    font-family:'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
     margin: 0;
-    color: var(--text-main);
-    transition: color 0.4s ease;
+    color: var(--plum);
   }
 
-  .owner-meta {
-    font-size: 0.78rem;
-    color: var(--text-soft);
-    margin-top: 2px;
-    transition: color 0.4s ease;
+  .owner-meta{
+    font-size: 0.84rem;
+    color: var(--plum-soft);
+    margin-top: 3px;
   }
 
-  .count-badge {
-    background: var(--badge-bg);
-    color: var(--badge-text);
+  .count-badge{
+    background: var(--white);
+    color: var(--rose-deep);
     font-weight: 700;
-    font-size: 0.78rem;
-    padding: 5px 10px;
+    font-size: 0.8rem;
+    padding: 6px 12px;
     border-radius: 999px;
-    box-shadow: 0 4px 12px var(--shadow-color);
-    min-width: 30px;
-    text-align: center;
-    transition: var(--transition-smooth);
+    box-shadow: 0 4px 12px rgba(196,62,112,0.15);
+    min-width: 34px;
+    text-align:center;
   }
 
-  /* --- ANIMASI KUCING HEADER (Smooth & Responsive) --- */
-  .mascot {
-    width: 52px;
-    height: 52px;
+  /* Mascot */
+  .mascot{
+    width: 54px;
+    height: 54px;
     flex-shrink: 0;
     position: relative;
   }
-  .mascot-face {
+  .mascot-face{
     width: 100%;
     height: 100%;
-    display: block;
-    transform-origin: center bottom;
+    display:block;
+    transition: transform 0.25s ease;
   }
-  .cat-base { fill: var(--cat-bg); stroke: var(--cat-border); stroke-width: 1.5; transition: fill 0.4s ease, stroke 0.4s ease; }
-  .cat-eye { fill: var(--cat-eye); transition: fill 0.4s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  .cat-blush { fill: var(--cat-blush); opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; transform-origin: center; }
-  .cat-mouth { stroke: var(--cat-eye); stroke-width: 2.2; stroke-linecap: round; fill: none; transition: stroke 0.4s ease, d 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-  .cat-brow { stroke: var(--cat-eye); stroke-width: 2; stroke-linecap: round; fill: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
-
-  /* States Ekspresi Kucing dengan Transisi Lembut */
-  .mascot.mood-neutral .cat-mouth { d: path("M28 38 Q32 39.5 36 38"); }
-  .mascot.mood-neutral .cat-blush { opacity: 0.35; transform: scale(1); }
-
-  .mascot.mood-sad .cat-brow { opacity: 1; transform: translateY(1px); }
-  .mascot.mood-sad .cat-mouth { d: path("M28 40.5 Q32 36.5 36 40.5"); }
-  .mascot.mood-sad .cat-blush { opacity: 0.1; transform: scale(0.8); }
-
-  .mascot.mood-happy .cat-blush { opacity: 0.95; transform: scale(1.15); }
-  .mascot.mood-happy .cat-mouth { d: path("M27 35.5 Q32 44.5 37 35.5"); }
-  .mascot.mood-happy .cat-eye { transform: scaleY(0.6); }
-
-  /* Animasi Gerak Kucing */
-  @keyframes cat-idle {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-3px) rotate(1.5deg); }
+  .face-bg{ fill: var(--mood-neutral); transition: fill 0.45s ease; }
+  .eye{ fill: var(--plum); transition: transform 0.25s ease; }
+  .cheek{ fill: #FF9EBA; opacity: 0; transition: opacity 0.4s ease; }
+  .brow{
+    stroke: var(--plum);
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, d 0.3s ease;
   }
-  .mascot.mood-neutral .mascot-face, .mascot.mood-sad .mascot-face { animation: cat-idle 3.5s ease-in-out infinite; }
-
-  @keyframes cat-jump {
-    0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-    30% { transform: translateY(-7px) scale(1.06) rotate(-2deg); }
-    60% { transform: translateY(0) scale(0.96) rotate(1deg); }
+  .mouth{
+    stroke: var(--plum);
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+    transition: d 0.35s ease;
   }
-  .mascot.mood-happy .mascot-face { animation: cat-jump 1.4s cubic-bezier(0.36, 1.4, 0.4, 1) infinite; }
 
-  /* Form Input & Upload */
-  .add-form {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  .mascot.mood-neutral .face-bg{ fill: var(--mood-neutral); }
+  .mascot.mood-angry .face-bg{ fill: var(--mood-angry); }
+  .mascot.mood-smile .face-bg{ fill: var(--mood-smile); }
+  .mascot.mood-happy .face-bg{ fill: var(--mood-happy); }
+
+  .mascot.mood-angry .brow{ opacity: 1; }
+  .mascot.mood-happy .cheek{ opacity: 0.9; }
+
+  @keyframes mascot-shake{
+    0%,100%{ transform: translateX(0) rotate(0deg); }
+    25%{ transform: translateX(-1.5px) rotate(-3deg); }
+    75%{ transform: translateX(1.5px) rotate(3deg); }
+  }
+  .mascot.mood-angry .mascot-face{ animation: mascot-shake 0.45s ease-in-out infinite; }
+
+  @keyframes mascot-sway{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-3px) rotate(2deg); }
+  }
+  .mascot.mood-smile .mascot-face{ animation: mascot-sway 2.6s ease-in-out infinite; }
+
+  @keyframes mascot-bounce{
+    0%,100%{ transform: translateY(0) scale(1); }
+    30%{ transform: translateY(-7px) scale(1.06); }
+    55%{ transform: translateY(0) scale(0.96); }
+    75%{ transform: translateY(-2px) scale(1.02); }
+  }
+  .mascot.mood-happy .mascot-face{ animation: mascot-bounce 1.5s cubic-bezier(.36,1.4,.4,1) infinite; }
+
+  .sparkle{
+    position: absolute;
+    width: 8px; height: 8px;
+    top: 50%; left: 50%;
+    margin: -4px 0 0 -4px;
+    background: radial-gradient(circle, #FFF1B8 0%, #FFCA4A 70%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .mascot.celebrate .sparkle{ animation: sparkle-pop 0.9s ease-out forwards; }
+  .mascot.celebrate .sparkle:nth-child(1){ animation-delay: 0s; }
+  .mascot.celebrate .sparkle:nth-child(2){ animation-delay: 0.08s; }
+  .mascot.celebrate .sparkle:nth-child(3){ animation-delay: 0.16s; }
+  .mascot.celebrate .sparkle:nth-child(4){ animation-delay: 0.05s; }
+  .mascot.celebrate .sparkle:nth-child(5){ animation-delay: 0.12s; }
+  .mascot.celebrate .sparkle:nth-child(6){ animation-delay: 0.2s; }
+  @keyframes sparkle-pop{
+    0%{ opacity: 0; transform: translate(0,0) scale(0.3); }
+    35%{ opacity: 1; }
+    100%{ opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
+  }
+  .sparkle:nth-child(1){ --tx: -26px; --ty: -22px; }
+  .sparkle:nth-child(2){ --tx: 0px; --ty: -32px; }
+  .sparkle:nth-child(3){ --tx: 26px; --ty: -22px; }
+  .sparkle:nth-child(4){ --tx: -24px; --ty: 18px; }
+  .sparkle:nth-child(5){ --tx: 0px; --ty: 30px; }
+  .sparkle:nth-child(6){ --tx: 24px; --ty: 18px; }
+
+  .add-row{
+    display:flex;
+    gap: 10px;
     margin-bottom: 12px;
     position: relative;
     z-index: 1;
   }
 
-  .input-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .add-form input[type="text"] {
+  .add-row input[type="text"]{
     flex: 1;
-    border: 1.5px solid var(--input-border);
-    background: var(--input-bg);
+    border: 1.5px solid transparent;
+    background: rgba(255,255,255,0.75);
     border-radius: var(--radius-sm);
-    padding: 11px 14px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text-main);
+    padding: 13px 16px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.96rem;
+    color: var(--plum);
     outline: none;
-    transition: var(--transition-smooth);
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
-  .add-form input[type="text"]::placeholder { color: var(--text-soft); opacity: 0.7; }
-  .add-form input[type="text"]:focus {
-    border-color: var(--text-main);
-    box-shadow: 0 0 0 3px var(--accent-shadow);
-  }
-
-  .file-upload-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--input-bg);
-    border: 1.5px dashed var(--input-border);
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 0.78rem;
-    color: var(--text-soft);
-    transition: var(--transition-smooth);
-  }
-  .file-upload-wrapper input[type="file"] { display: none; }
-  .file-upload-btn {
-    background: var(--badge-bg);
-    color: var(--badge-text);
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.74rem;
-    transition: opacity 0.2s;
-  }
-  .file-upload-btn:hover { opacity: 0.85; }
-  .file-name-display {
-    max-width: 170px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .add-row input[type="text"]::placeholder{ color: #B98098; }
+  .add-row input[type="text"]:focus{
+    border-color: var(--rose-mid);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(232,85,138,0.14);
   }
 
-  .add-btn {
+  .add-btn{
     border: none;
-    background: var(--accent-gradient);
-    color: var(--tab-active-text);
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    color: var(--white);
     font-weight: 700;
-    font-size: 0.88rem;
-    padding: 0 18px;
+    font-size: 0.92rem;
+    padding: 0 22px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: transform 0.15s ease, filter 0.15s ease;
-    box-shadow: 0 4px 12px var(--accent-shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
   }
-  .add-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
-  .add-btn:active { transform: scale(0.97); }
+  .add-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+  .add-btn:active{ transform: translateY(0px) scale(0.97); }
 
-  /* Clear Action */
+  /* Clear All Action Bar (Top) */
   .clear-all-container {
-    margin-bottom: 12px;
+    margin-bottom: 18px;
     display: flex;
     justify-content: flex-end;
     position: relative;
@@ -406,155 +389,159 @@
   }
   .clear-all-btn {
     border: none;
-    background: var(--badge-bg);
-    color: var(--badge-text);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: rgba(196, 62, 112, 0.1);
+    color: var(--rose-deep);
+    font-family: 'Manrope', sans-serif;
     font-weight: 700;
-    font-size: 0.74rem;
-    padding: 6px 12px;
+    font-size: 0.81rem;
+    padding: 7px 14px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: var(--transition-smooth);
-    box-shadow: 0 2px 8px var(--shadow-color);
+    gap: 6px;
+    transition: all 0.25s ease;
   }
-  .clear-all-btn svg { width: 12px; height: 12px; }
-  .clear-all-btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
-  .clear-all-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .clear-all-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  .clear-all-btn:not(:disabled):hover {
+    background: var(--rose-deep);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(196,62,112,0.25);
+  }
+  .clear-all-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: rgba(62, 31, 46, 0.04);
+    color: var(--plum-soft);
+  }
 
-  /* Task Sections & Items */
+  /* Sections for Task Groups */
   .task-section-title {
-    font-size: 0.76rem;
+    font-size: 0.82rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-soft);
-    margin: 10px 0 6px 2px;
+    color: var(--plum-soft);
+    margin: 14px 0 6px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .task-section-title:first-of-type {
+    margin-top: 0;
   }
 
-  .task-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
+  .task-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
     flex-direction: column;
     gap: 8px;
     position: relative;
     z-index: 1;
   }
 
-  .task-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: var(--task-bg);
-    border: 1px solid var(--panel-border);
+  .task-item{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    background: rgba(255,255,255,0.72);
     border-radius: var(--radius-md);
-    padding: 10px 12px;
-    transition: background 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+    padding: 12px 14px;
+    transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.4s ease, transform 0.4s ease;
   }
-  .task-item.clearing { opacity: 0; transform: translateY(-10px) scale(0.95); }
-  .task-item:hover { background: var(--task-hover); }
 
-  .checkbox {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    border: 2px solid var(--checkbox-border);
+  .task-item.clearing {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+
+  .task-item:hover{
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 4px 12px rgba(62,31,46,0.06);
+  }
+
+  .checkbox{
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--rose-soft);
     flex-shrink: 0;
     cursor: pointer;
     position: relative;
-    background: var(--badge-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
-    transition: var(--transition-smooth);
+    background: var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
-  .checkbox.checked {
-    background: var(--checkbox-checked);
-    border-color: transparent;
+  .checkbox.checked{
+    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
+    border-color: var(--rose-deep);
   }
-  .checkbox svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.2s; }
-  .checkbox.checked svg { opacity: 1; }
+  .checkbox svg{
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+  }
+  .checkbox.checked svg{ opacity: 1; }
 
-  .task-content {
+  .task-text{
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    font-size: 0.97rem;
+    line-height: 1.4;
+    color: var(--plum);
     word-break: break-word;
   }
-
-  .task-text {
-    font-size: 0.9rem;
-    line-height: 1.35;
-    color: var(--text-main);
-    transition: color 0.3s ease;
-  }
-  .task-item.done .task-text {
-    color: var(--text-soft);
+  .task-item.done .task-text{
+    color: #B591A2;
     text-decoration: line-through;
-    opacity: 0.65;
+    text-decoration-color: #C99DB2;
   }
 
-  .task-file-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--text-main);
-    text-decoration: none;
-    background: var(--badge-bg);
-    padding: 3px 8px;
-    border-radius: 4px;
-    width: fit-content;
-    border: 1px solid var(--panel-border);
-    opacity: 0.9;
-    transition: opacity 0.2s;
-  }
-  .task-file-link svg { width: 10px; height: 10px; }
-  .task-file-link:hover { opacity: 1; text-decoration: underline; }
-
-  .delete-btn {
+  .delete-btn{
     border: none;
     background: transparent;
-    color: var(--text-soft);
+    color: #C08199;
     cursor: pointer;
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.15s, color 0.15s;
-    opacity: 0.5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition: background 0.15s ease, color 0.15s ease;
+    opacity: 0;
   }
-  .task-item:hover .delete-btn { opacity: 1; }
-  .delete-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-  .delete-btn svg { width: 14px; height: 14px; }
+  .task-item:hover .delete-btn,
+  .task-item:focus-within .delete-btn{ opacity: 1; }
+  .delete-btn:hover{ background: rgba(196,62,112,0.12); color: var(--rose-deep); }
+  .delete-btn svg{ width: 15px; height: 15px; }
 
-  .empty-state {
+  .empty-state{
     flex: 1;
-    display: flex;
+    display:flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px 10px;
-    color: var(--text-soft);
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 30px 10px;
+    color: var(--plum-soft);
     position: relative;
     z-index: 1;
   }
-  .empty-state svg { width: 38px; height: 38px; opacity: 0.4; margin-bottom: 8px; }
-  .empty-state p { margin: 0; font-size: 0.86rem; max-width: 24ch; line-height: 1.4; }
+  .empty-state svg{ width: 46px; height: 46px; opacity: 0.55; margin-bottom: 12px; }
+  .empty-state p{ margin: 0; font-size: 0.92rem; max-width: 26ch; line-height: 1.5; }
+
+  ::selection{ background: var(--rose-soft); color: var(--plum); }
 </style>
 </head>
-<body class="mode-paan">
+<body>
 
 <div class="backdrop-orb orb-1"></div>
 <div class="backdrop-orb orb-2"></div>
@@ -563,15 +550,15 @@
 
   <header class="hero">
     <h1>Nugas Mahasigma</h1>
-    <p class="hero-sub" id="motivationText">Kelola tugas kuliah bersama secara real-time dan terstruktur.</p>
+    <p class="hero-sub"><span class="motivation-text" id="motivationText">Adaaa akuuu sayangggggg</span></p>
 
     <div class="tab-switch" id="tabSwitch" data-active="paan">
       <div class="tab-thumb"></div>
       <button type="button" class="tab-btn active" data-tab="paan">
-        Paan List <span class="tab-count" id="tabCountPaan">0</span>
+        <span class="tab-dot"></span> Paan List <span class="tab-count" id="tabCountPaan">0</span>
       </button>
       <button type="button" class="tab-btn" data-tab="myla">
-        Myla List <span class="tab-count" id="tabCountMyla">0</span>
+        <span class="tab-dot"></span> Mya List <span class="tab-count" id="tabCountMyla">0</span>
       </button>
     </div>
   </header>
@@ -579,99 +566,77 @@
   <main class="board" id="board" data-active="paan">
     <div class="board-track">
 
-      <!-- Panel Paan (Kucing Hitam Bergerak) -->
       <section class="panel paan" aria-label="Daftar tugas Paan">
+        <div class="panel-glow"></div>
         <div class="panel-header">
           <div class="owner-block">
             <div class="mascot mood-neutral" id="paanMascot" aria-hidden="true">
               <svg class="mascot-face" viewBox="0 0 64 64">
-                <polygon class="cat-base" points="14,20 6,4 24,14"/>
-                <polygon class="cat-base" points="50,20 58,4 40,14"/>
-                <circle class="cat-base" cx="32" cy="36" r="21"/>
-                <path class="cat-brow" d="M19 28 L25 31"/>
-                <path class="cat-brow" d="M45 28 L39 31"/>
-                <circle class="cat-eye" cx="22" cy="32" r="3.2"/>
-                <circle class="cat-eye" cx="42" cy="32" r="3.2"/>
-                <circle class="cat-blush" cx="17" cy="38" r="4.5"/>
-                <circle class="cat-blush" cx="47" cy="38" r="4.5"/>
-                <path class="cat-mouth" d="M28 38 Q32 39.5 36 38"/>
+                <circle class="face-bg" cx="32" cy="32" r="30"/>
+                <path class="brow brow-l" id="paanBrowL" d="M15 20 L27 25"/>
+                <path class="brow brow-r" id="paanBrowR" d="M49 20 L37 25"/>
+                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
+                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
+                <path class="mouth" id="paanMouth" d="M23 40 Q32 40 41 40"/>
               </svg>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
             </div>
             <div>
-              <p class="owner-name">Paan List</p>
+              <p class="owner-name">Paan</p>
               <p class="owner-meta" id="paanMeta">Menghubungkan...</p>
             </div>
           </div>
           <div class="count-badge" id="paanCount">0</div>
         </div>
-
-        <form class="add-form" id="paanForm">
-          <div class="input-row">
-            <input type="text" id="paanInput" placeholder="Tambah tugas untuk Paan..." maxlength="140" autocomplete="off">
-            <button type="submit" class="add-btn">Tambah</button>
-          </div>
-          <div class="file-upload-wrapper">
-            <span class="file-name-display" id="paanFileName">Tidak ada file materi</span>
-            <label class="file-upload-btn">
-              Pilih File
-              <input type="file" id="paanFile">
-            </label>
-          </div>
+        <form class="add-row" id="paanForm">
+          <input type="text" id="paanInput" placeholder="Tambah tugas untuk Paan" maxlength="140" autocomplete="off">
+          <button type="submit" class="add-btn">Tambah</button>
         </form>
-
         <div class="clear-all-container">
           <button type="button" class="clear-all-btn" id="paanClearBtn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-            Hapus Selesai
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Hapus Semua Tugas
           </button>
         </div>
         <div id="paanContainer"></div>
       </section>
 
-      <!-- Panel Myla (Kucing Putih Bergerak) -->
       <section class="panel myla" aria-label="Daftar tugas Myla">
+        <div class="panel-glow"></div>
         <div class="panel-header">
           <div class="owner-block">
             <div class="mascot mood-neutral" id="mylaMascot" aria-hidden="true">
               <svg class="mascot-face" viewBox="0 0 64 64">
-                <polygon class="cat-base" points="14,20 6,4 24,14"/>
-                <polygon class="cat-base" points="50,20 58,4 40,14"/>
-                <circle class="cat-base" cx="32" cy="36" r="21"/>
-                <path class="cat-brow" d="M19 28 L25 31"/>
-                <path class="cat-brow" d="M45 28 L39 31"/>
-                <circle class="cat-eye" cx="22" cy="32" r="3.2"/>
-                <circle class="cat-eye" cx="42" cy="32" r="3.2"/>
-                <circle class="cat-blush" cx="17" cy="38" r="4.5"/>
-                <circle class="cat-blush" cx="47" cy="38" r="4.5"/>
-                <path class="cat-mouth" d="M28 38 Q32 39.5 36 38"/>
+                <circle class="face-bg" cx="32" cy="32" r="30"/>
+                <path class="brow brow-l" id="mylaBrowL" d="M15 20 L27 25"/>
+                <path class="brow brow-r" id="mylaBrowR" d="M49 20 L37 25"/>
+                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
+                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
+                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
+                <path class="mouth" id="mylaMouth" d="M23 40 Q32 40 41 40"/>
               </svg>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
+              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
             </div>
             <div>
-              <p class="owner-name">Myla List</p>
+              <p class="owner-name">Myla</p>
               <p class="owner-meta" id="mylaMeta">Menghubungkan...</p>
             </div>
           </div>
           <div class="count-badge" id="mylaCount">0</div>
         </div>
-
-        <form class="add-form" id="mylaForm">
-          <div class="input-row">
-            <input type="text" id="mylaInput" placeholder="Tambah tugas untuk Myla..." maxlength="140" autocomplete="off">
-            <button type="submit" class="add-btn">Tambah</button>
-          </div>
-          <div class="file-upload-wrapper">
-            <span class="file-name-display" id="mylaFileName">Tidak ada file materi</span>
-            <label class="file-upload-btn">
-              Pilih File
-              <input type="file" id="mylaFile">
-            </label>
-          </div>
+        <form class="add-row" id="mylaForm">
+          <input type="text" id="mylaInput" placeholder="Tambah tugas untuk Myla" maxlength="140" autocomplete="off">
+          <button type="submit" class="add-btn">Tambah</button>
         </form>
-
         <div class="clear-all-container">
           <button type="button" class="clear-all-btn" id="mylaClearBtn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-            Hapus Selesai
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Hapus Semua Tugas
           </button>
         </div>
         <div id="mylaContainer"></div>
@@ -684,6 +649,7 @@
 
 <script>
 (function(){
+  // --- KONFIGURASI FIREBASE ---
   const firebaseConfig = {
     apiKey: "AIzaSyDikwxCVKGAbkwfJtAbjRwKBp1UpKjv35c",
     authDomain: "nugas-myla-dan-paan.firebaseapp.com",
@@ -695,75 +661,80 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const storage = firebase.storage();
 
   const OWNERS = ['paan', 'myla'];
   let state = { paan: [], myla: [] };
   let currentTab = 'paan';
-  let selectedFiles = { paan: null, myla: null };
+  const lastMood = { paan: 'neutral', myla: 'neutral' };
 
   const els = {
     paan: {
       form: document.getElementById('paanForm'),
       input: document.getElementById('paanInput'),
-      fileInput: document.getElementById('paanFile'),
-      fileNameDisplay: document.getElementById('paanFileName'),
       container: document.getElementById('paanContainer'),
       clearBtn: document.getElementById('paanClearBtn'),
       count: document.getElementById('paanCount'),
       meta: document.getElementById('paanMeta'),
       mascot: document.getElementById('paanMascot'),
+      mouth: document.getElementById('paanMouth'),
+      browL: document.getElementById('paanBrowL'),
+      browR: document.getElementById('paanBrowR'),
       tabCount: document.getElementById('tabCountPaan')
     },
     myla: {
       form: document.getElementById('mylaForm'),
       input: document.getElementById('mylaInput'),
-      fileInput: document.getElementById('mylaFile'),
-      fileNameDisplay: document.getElementById('mylaFileName'),
       container: document.getElementById('mylaContainer'),
       clearBtn: document.getElementById('mylaClearBtn'),
       count: document.getElementById('mylaCount'),
       meta: document.getElementById('mylaMeta'),
       mascot: document.getElementById('mylaMascot'),
+      mouth: document.getElementById('mylaMouth'),
+      browL: document.getElementById('mylaBrowL'),
+      browR: document.getElementById('mylaBrowR'),
       tabCount: document.getElementById('tabCountMyla')
     }
   };
 
-  const emptySVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M8 16h5"/></svg>`;
+  const emptySVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4" stroke-opacity="0"/><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M8 16h5"/></svg>`;
   const checkSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-  const trashSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`;
-  const fileIconSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  const trashSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
 
-  function updateTheme(tab) {
-    document.body.classList.remove('mode-paan', 'mode-myla');
-    if(tab === 'paan') {
-      document.body.classList.add('mode-paan');
-    } else {
-      document.body.classList.add('mode-myla');
-    }
+  const MOUTHS = {
+    angry: "M22 43 Q32 35 42 43",
+    neutral: "M23 40 Q32 40 41 40",
+    smile: "M21 35 Q32 46 43 35",
+    happy: "M18 32 Q32 50 46 32"
+  };
+  const BROWS = {
+    l: "M14 24 L27 20",
+    r: "M50 24 L37 20"
+  };
+
+  function moodFor(list){
+    const total = list.length;
+    if(total === 0) return 'neutral';
+    const done = list.filter(t => t.done).length;
+    const ratio = done / total;
+    if(ratio >= 1) return 'happy';
+    if(ratio >= 0.6) return 'smile';
+    return 'angry';
   }
 
-  function updateMascot(owner, list){
-    const total = list.length;
-    const mascotEl = els[owner].mascot;
-    if(!mascotEl) return;
-    mascotEl.classList.remove('mood-neutral', 'mood-sad', 'mood-happy');
-
-    if(total === 0) {
-      mascotEl.classList.add('mood-neutral');
-      return;
+  function updateMascot(owner, mood){
+    const el = els[owner];
+    el.mascot.classList.remove('mood-neutral', 'mood-angry', 'mood-smile', 'mood-happy');
+    el.mascot.classList.add('mood-' + mood);
+    el.mouth.setAttribute('d', MOUTHS[mood]);
+    if(mood === 'angry'){
+      el.browL.setAttribute('d', BROWS.l);
+      el.browR.setAttribute('d', BROWS.r);
     }
-
-    const doneCount = list.filter(t => t.done).length;
-    const ratio = doneCount / total;
-
-    if(ratio === 1) {
-      mascotEl.classList.add('mood-happy');
-    } else if(ratio < 0.3) {
-      mascotEl.classList.add('mood-sad');
-    } else {
-      mascotEl.classList.add('mood-neutral');
+    if(mood === 'happy' && lastMood[owner] !== 'happy'){
+      el.mascot.classList.add('celebrate');
+      setTimeout(() => el.mascot.classList.remove('celebrate'), 950);
     }
+    lastMood[owner] = mood;
   }
 
   function render(owner){
@@ -773,13 +744,17 @@
     el.count.textContent = remaining;
     el.tabCount.textContent = remaining;
     const doneCount = list.filter(t => t.done).length;
-    el.meta.textContent = list.length === 0 ? 'Belum ada tugas' : `${list.length} tugas · ${doneCount} selesai`;
+    el.meta.textContent = list.length === 0
+      ? 'Belum ada tugas'
+      : `${list.length} tugas · ${doneCount} selesai`;
 
-    updateMascot(owner, list);
-    el.clearBtn.disabled = !(doneCount > 0);
+    updateMascot(owner, moodFor(list));
+
+    const allDone = list.length > 0 && doneCount === list.length;
+    el.clearBtn.disabled = !allDone;
 
     if(list.length === 0){
-      el.container.innerHTML = `<div class="empty-state">${emptySVG}<p>Belum ada tugas. Silakan tambahkan tugas baru.</p></div>`;
+      el.container.innerHTML = `<div class="empty-state">${emptySVG}<p>Belum ada tugas di sini. Tambahkan yang pertama di atas.</p></div>`;
       return;
     }
 
@@ -787,14 +762,34 @@
     const completed = list.filter(t => t.done).sort((a,b) => a.createdAt - b.createdAt);
 
     let html = '';
+
     if(uncompleted.length > 0){
-      html += `<div class="task-section-title">Belum Selesai (${uncompleted.length})</div><ul class="task-list">`;
-      uncompleted.forEach(task => html += buildTaskHtml(task));
+      html += `<div class="task-section-title">Belum Selesai (${uncompleted.length})</div>`;
+      html += `<ul class="task-list">`;
+      uncompleted.forEach(task => {
+        html += `
+          <li class="task-item" data-id="${task.id}">
+            <div class="checkbox" role="checkbox" tabindex="0" aria-label="Tandai selesai">${checkSVG}</div>
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
+          </li>
+        `;
+      });
       html += `</ul>`;
     }
+
     if(completed.length > 0){
-      html += `<div class="task-section-title">Sudah Selesai (${completed.length})</div><ul class="task-list">`;
-      completed.forEach(task => html += buildTaskHtml(task));
+      html += `<div class="task-section-title">Sudah Selesai (${completed.length})</div>`;
+      html += `<ul class="task-list">`;
+      completed.forEach(task => {
+        html += `
+          <li class="task-item done" data-id="${task.id}">
+            <div class="checkbox checked" role="checkbox" tabindex="0" aria-label="Tandai belum selesai">${checkSVG}</div>
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
+          </li>
+        `;
+      });
       html += `</ul>`;
     }
 
@@ -803,95 +798,26 @@
     el.container.querySelectorAll('.task-item').forEach(li => {
       const id = li.dataset.id;
       li.querySelector('.checkbox').addEventListener('click', () => toggleTask(owner, id));
+      li.querySelector('.checkbox').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(owner, id); }
+      });
       li.querySelector('.delete-btn').addEventListener('click', () => removeTask(owner, id));
     });
-  }
-
-  function buildTaskHtml(task) {
-    let fileHtml = '';
-    if(task.fileUrl && task.fileName) {
-      fileHtml = `<a href="${task.fileUrl}" target="_blank" class="task-file-link">${fileIconSVG} ${escapeHtml(task.fileName)}</a>`;
-    }
-    return `
-      <li class="task-item ${task.done ? 'done' : ''}" data-id="${task.id}">
-        <div class="checkbox ${task.done ? 'checked' : ''}" role="checkbox">${checkSVG}</div>
-        <div class="task-content">
-          <span class="task-text">${escapeHtml(task.text)}</span>
-          ${fileHtml}
-        </div>
-        <button type="button" class="delete-btn" aria-label="Hapus">${trashSVG}</button>
-      </li>
-    `;
   }
 
   function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
 
+  // --- REALTIME SYNC DENGAN FIRESTORE ---
   OWNERS.forEach(owner => {
     db.collection("tasks").doc(owner).onSnapshot((doc) => {
-      state[owner] = doc.exists ? (doc.data().items || []) : [];
-      render(owner);
-    }, (error) => {
-      console.error("Firestore snapshot error:", error);
-    });
-
-    els[owner].fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if(file) {
-        selectedFiles[owner] = file;
-        els[owner].fileNameDisplay.textContent = file.name;
+      if (doc.exists) {
+        state[owner] = doc.data().items || [];
+      } else {
+        state[owner] = [];
       }
-    });
-
-    els[owner].form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const text = els[owner].input.value.trim();
-      if(!text) return;
-
-      let fileUrl = null;
-      let fileName = null;
-      const file = selectedFiles[owner];
-
-      if(file) {
-        try {
-          const storageRef = storage.ref(`materi_tugas/${Date.now()}_${file.name}`);
-          const snapshot = await storageRef.put(file);
-          fileUrl = await snapshot.ref.getDownloadURL();
-          fileName = file.name;
-        } catch(err) {
-          console.warn("Upload file gagal/dilewati, melanjutkan simpan teks tugas:", err);
-        }
-      }
-
-      const newTask = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-        text: text,
-        done: false,
-        fileUrl: fileUrl,
-        fileName: fileName,
-        createdAt: Date.now()
-      };
-
-      state[owner].push(newTask);
-
-      els[owner].input.value = '';
-      els[owner].fileInput.value = '';
-      selectedFiles[owner] = null;
-      els[owner].fileNameDisplay.textContent = 'Tidak ada file materi';
-
       render(owner);
-      syncToFirebase(owner);
-    });
-
-    els[owner].clearBtn.addEventListener('click', () => {
-      const completedItems = els[owner].container.querySelectorAll('.task-item.done');
-      completedItems.forEach(i => i.classList.add('clearing'));
-      setTimeout(() => {
-        state[owner] = state[owner].filter(t => !t.done);
-        render(owner);
-        syncToFirebase(owner);
-      }, 300);
     });
   });
 
@@ -899,8 +825,16 @@
     try {
       await db.collection("tasks").doc(owner).set({ items: state[owner] });
     } catch(err) {
-      console.error("Sync error:", err);
+      console.error("Firebase sync error:", err);
     }
+  }
+
+  function addTask(owner, text){
+    const trimmed = text.trim();
+    if(!trimmed) return;
+    state[owner].push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), text: trimmed, done: false, createdAt: Date.now() });
+    render(owner);
+    syncToFirebase(owner);
   }
 
   function toggleTask(owner, id){
@@ -917,6 +851,28 @@
     syncToFirebase(owner);
   }
 
+  function clearAllTasks(owner){
+    const items = els[owner].container.querySelectorAll('.task-item');
+    items.forEach(item => item.classList.add('clearing'));
+    setTimeout(() => {
+      state[owner] = [];
+      render(owner);
+      syncToFirebase(owner);
+    }, 380);
+  }
+
+  OWNERS.forEach(owner => {
+    els[owner].form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      addTask(owner, els[owner].input.value);
+      els[owner].input.value = '';
+      els[owner].input.focus();
+    });
+    els[owner].clearBtn.addEventListener('click', () => {
+      clearAllTasks(owner);
+    });
+  });
+
   const tabSwitch = document.getElementById('tabSwitch');
   const board = document.getElementById('board');
   const tabButtons = tabSwitch.querySelectorAll('.tab-btn');
@@ -926,12 +882,39 @@
     tabSwitch.dataset.active = tab;
     board.dataset.active = tab;
     tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-    updateTheme(tab);
   }
 
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
   });
+
+  // Motivator rotation
+  const motivationLines = [
+    'Real-time sync otomatis antar perangkat via Firebase Firestore.',
+    'Skripsi tidak akan selesai sendiri, tapi satu tugas selesai hari ini sudah kemajuan.',
+    'Deadline terasa dekat, tapi langkah kecil hari ini yang membawamu sampai di sana.',
+    'IPK tinggi dimulai dari to-do list yang dicoret satu per satu.',
+    'Bukan soal secepat apa, tapi soal seberapa konsisten kamu mencentang tugas.',
+    'Semester ini berat, tapi bukan berarti tidak bisa dilewati pelan-pelan.',
+    'Revisi dosen memang menyebalkan, tapi setiap revisi mendekatkanmu ke sidang.',
+    'Kerjakan yang bisa dikerjakan hari ini, sisanya urus besok dengan kepala lebih segar.',
+    'Kuliah sambil begadang boleh sesekali, tapi jangan lupa istirahat juga bagian dari produktif.',
+    'Satu tugas selesai lebih baik daripada sepuluh rencana yang tidak dimulai.'
+  ];
+
+  let motivationIndex = 0;
+  const motivationEl = document.getElementById('motivationText');
+
+  function rotateMotivation(){
+    motivationEl.classList.add('fading');
+    setTimeout(() => {
+      motivationIndex = (motivationIndex + 1) % motivationLines.length;
+      motivationEl.textContent = motivationLines[motivationIndex];
+      motivationEl.classList.remove('fading');
+    }, 550);
+  }
+
+  setInterval(rotateMotivation, 5200);
 })();
 </script>
 
