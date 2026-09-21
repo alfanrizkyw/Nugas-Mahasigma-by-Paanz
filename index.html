@@ -2,552 +2,730 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FFE9F1" id="themeColorMeta">
 <title>Nugas Mahasigma — Paan & Mya</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase SDK -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 <style>
-  :root{
-    --cream: #FFF6F8;
-    --panel-paan: #FFE3ED;
-    --panel-myla: #FFD9E9;
-    --rose-deep: #C43E70;
-    --rose-mid: #E8558A;
-    --rose-soft: #FFB6CE;
-    --plum: #3E1F2E;
-    --plum-soft: #7A5064;
-    --line: rgba(62, 31, 46, 0.10);
-    --white: #FFFFFF;
-    --shadow-color: rgba(196, 62, 112, 0.18);
-    --radius-lg: 28px;
-    --radius-md: 18px;
-    --radius-sm: 12px;
-    --mood-angry: #FF7A72;
-    --mood-neutral: #FFC9DF;
-    --mood-smile: #FFD98A;
-    --mood-happy: #FFCA4A;
-  }
+:root{
+  --radius-lg:26px; --radius-md:16px; --radius-sm:12px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --font-body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-display:'Fraunces',Georgia,serif;
+}
+body[data-mode="myla"]{
+  --ink:#3E1F2E; --ink-soft:#7A5064; --ink-faint:#BC93A6;
+  --accent:#E8558A; --accent-deep:#C43E70; --accent-soft:#FFB6CE;
+  --on-accent:#FFFFFF;
+  --card:rgba(255,255,255,.72); --card-hover:rgba(255,255,255,.94);
+  --track:rgba(255,255,255,.5);
+  --panel-border:rgba(255,255,255,.75);
+  --line:rgba(62,31,46,.10);
+  --shadow:rgba(196,62,112,.22);
+  --font-display:'Fraunces',Georgia,serif;
+  --focus-ring:rgba(232,85,138,.16);
+}
+body[data-mode="paanz"]{
+  --ink:#ECEEF6; --ink-soft:#9BA2B8; --ink-faint:#6A7188;
+  --accent:#8B98FF; --accent-deep:#5A69E8; --accent-soft:#2B3157;
+  --on-accent:#FFFFFF;
+  --card:rgba(255,255,255,.05); --card-hover:rgba(255,255,255,.10);
+  --track:rgba(255,255,255,.05);
+  --panel-border:rgba(255,255,255,.09);
+  --line:rgba(255,255,255,.09);
+  --shadow:rgba(0,0,0,.55);
+  --font-display:'Space Grotesk','Manrope',sans-serif;
+  --focus-ring:rgba(139,152,255,.20);
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0; min-height:100vh; min-height:100dvh;
+  font-family:var(--font-body); color:var(--ink);
+  background:#0C0C12; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  transition:color .55s var(--ease);
+}
+.bg-layer{position:fixed; inset:0; z-index:0; pointer-events:none; transition:opacity .8s var(--ease);}
+.bg-layer--myla{
+  background:
+    radial-gradient(760px 520px at 88% -12%, rgba(255,178,212,.70), transparent 66%),
+    radial-gradient(680px 540px at 2% 106%, rgba(240,140,190,.45), transparent 66%),
+    linear-gradient(160deg,#FFF7FA 0%,#FFE9F1 45%,#FFD8E8 100%);
+  opacity:1;
+}
+.bg-layer--paanz{
+  background:
+    radial-gradient(760px 520px at 88% -12%, rgba(96,110,200,.30), transparent 66%),
+    radial-gradient(680px 540px at 2% 106%, rgba(58,68,148,.26), transparent 66%),
+    linear-gradient(160deg,#07070C 0%,#0D0D15 45%,#14141F 100%);
+  opacity:0;
+}
+body[data-mode="paanz"] .bg-layer--myla{opacity:0;}
+body[data-mode="paanz"] .bg-layer--paanz{opacity:1;}
+::selection{background:var(--accent-soft);color:var(--ink);}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px;}
+.page{
+  position:relative; z-index:1; width:100%; max-width:760px;
+  margin:0 auto;
+  padding:clamp(22px,5.5vw,52px) clamp(14px,4vw,24px) calc(72px + env(safe-area-inset-bottom));
+}
+.hero{display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:clamp(18px,4vw,28px);}
 
-  *{ box-sizing: border-box; }
+h1{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1.85rem,7vw,3rem); line-height:1.05;
+  letter-spacing:-.015em; margin:6px 0 0; color:var(--ink);
+  transition:color .5s var(--ease);
+}
+body[data-mode="paanz"] h1{
+  background:linear-gradient(180deg,#FFFFFF 0%,#DCE0EC 38%,#98A0B6 70%,#666D86 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  letter-spacing:-.025em;
+}
+.hero-sub{
+  font-size:clamp(.9rem,2.6vw,.99rem); color:var(--ink-soft);
+  max-width:46ch; margin:12px 0 0; line-height:1.6;
+  min-height:1.7em; transition:color .5s var(--ease);
+}
+.motivation-text{display:inline-block; opacity:1; transform:translateY(0); transition:opacity .55s var(--ease), transform .55s var(--ease);}
+.motivation-text.fading{opacity:0; transform:translateY(6px);}
 
-  html, body{
-    margin:0;
-    padding:0;
-    min-height:100vh;
-    background: linear-gradient(160deg, #FFF6F8 0%, #FFE9F1 45%, #FFD8E8 100%);
-    background-attachment: fixed;
-    font-family: 'Manrope', sans-serif;
-    color: var(--plum);
-    -webkit-font-smoothing: antialiased;
-  }
+.tab-switch{
+  --tab-pad:5px;
+  position:relative; display:inline-flex; align-items:center;
+  background:var(--track); border-radius:999px; padding:var(--tab-pad);
+  margin:clamp(16px,4vw,22px) 0 0; flex-shrink:1; min-width:0;
+  box-shadow:inset 0 0 0 1.5px var(--panel-border), 0 14px 34px -18px var(--shadow);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  transition:background .55s var(--ease), box-shadow .55s var(--ease);
+}
+.tab-switch.bump{ animation:tab-bump .65s var(--ease); }
+@keyframes tab-bump{
+  0%,100% { transform:scale(1); }
+  35%     { transform:scale(1.05); }
+  65%     { transform:scale(.98); }
+}
+.tab-thumb{
+  position:absolute; top:var(--tab-pad); left:var(--tab-pad);
+  height:calc(100% - var(--tab-pad) * 2); width:0;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  box-shadow:0 8px 20px -8px var(--accent-deep);
+  transition:transform .48s var(--ease), width .48s var(--ease), background .55s var(--ease);
+  z-index:0;
+}
+.tab-btn{
+  position:relative; z-index:1; border:none; background:transparent;
+  font-weight:700; font-size:clamp(.78rem,2.4vw,.9rem); color:var(--ink-soft);
+  padding:10px clamp(11px,3.6vw,22px); border-radius:999px; cursor:pointer;
+  display:flex; align-items:center; gap:7px; white-space:nowrap;
+  transition:color .35s ease; -webkit-tap-highlight-color:transparent;
+}
+.tab-btn.active{color:var(--on-accent);}
+.tab-dot{width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.55; flex-shrink:0;}
+.tab-count{font-size:.74rem; font-weight:800; opacity:.8;}
 
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  }
+.board{
+  position:relative; overflow:hidden; border-radius:var(--radius-lg);
+  box-shadow:0 22px 60px -24px var(--shadow), 0 2px 10px rgba(0,0,0,.06);
+  transition:box-shadow .55s var(--ease);
+}
+.board-track{display:flex; width:200%; transition:transform .55s var(--ease); will-change:transform;}
+.board[data-active="myla"] .board-track{transform:translateX(-50%);}
+.panel{
+  width:50%; flex-shrink:0;
+  padding:clamp(18px,4.5vw,28px) clamp(14px,4vw,26px) clamp(20px,4vw,26px);
+  position:relative; overflow:hidden; display:flex; flex-direction:column; min-height:440px;
+}
+.panel.paan{
+  --ink:#ECEEF6; --ink-soft:#9BA2B8; --ink-faint:#6A7188;
+  --accent:#8B98FF; --accent-deep:#5A69E8; --accent-soft:#2B3157;
+  --on-accent:#FFFFFF;
+  --card:rgba(255,255,255,.05); --card-hover:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.09);
+  --panel-border:rgba(255,255,255,.08);
+  --focus-ring:rgba(139,152,255,.20);
+  --font-display:'Space Grotesk','Manrope',sans-serif;
+  background:linear-gradient(150deg,#17171F 0%,#101018 55%,#1C1C2A 100%);
+  color:var(--ink);
+}
+.panel.myla{
+  --ink:#3E1F2E; --ink-soft:#7A5064; --ink-faint:#BC93A6;
+  --accent:#E8558A; --accent-deep:#C43E70; --accent-soft:#FFB6CE;
+  --on-accent:#FFFFFF;
+  --card:rgba(255,255,255,.72); --card-hover:rgba(255,255,255,.94);
+  --line:rgba(62,31,46,.10);
+  --panel-border:rgba(255,255,255,.75);
+  --focus-ring:rgba(232,85,138,.16);
+  --font-display:'Fraunces',Georgia,serif;
+  background:linear-gradient(150deg,#FFEFF5 0%,#FFE3ED 55%,#FFC9DF 100%);
+  color:var(--ink);
+}
+.panel-glow{position:absolute; width:240px; height:240px; border-radius:50%; top:-90px; right:-70px; pointer-events:none;}
+.panel.paan .panel-glow{background:radial-gradient(circle, rgba(139,152,255,.18) 0%, transparent 70%);}
+.panel.myla .panel-glow{background:radial-gradient(circle, rgba(255,255,255,.8) 0%, transparent 72%);}
+.panel-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom:10px; position:relative; z-index:1;
+}
+.owner-block{display:flex; align-items:center; gap:12px; min-width:0;}
+.owner-name{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1.3rem,4.4vw,1.55rem); margin:0; line-height:1.1; color:var(--ink);
+}
+.panel.paan .owner-name{
+  background:linear-gradient(180deg,#FFFFFF 0%,#D8DCEA 38%,#9AA2B8 70%,#69708A 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  letter-spacing:-.02em;
+}
+.owner-meta{
+  font-size:.8rem; color:var(--ink-soft); margin:3px 0 0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
-  .backdrop-orb{
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.5;
-    z-index: 0;
-    pointer-events: none;
-  }
-  .orb-1{ width: 420px; height: 420px; top: -160px; right: -120px; background: radial-gradient(circle, #FFC2DA 0%, transparent 70%); }
-  .orb-2{ width: 380px; height: 380px; bottom: -180px; left: -140px; background: radial-gradient(circle, #F79AC0 0%, transparent 70%); }
+.panel-play-scene{
+  display:flex; align-items:center; justify-content:center;
+  gap:clamp(4px,1.6vw,12px);
+  margin:6px 0 clamp(10px,3vw,16px);
+  padding:clamp(6px,2vw,10px) 0;
+  position:relative; z-index:1;
+}
+.cat-stage{
+  position:relative; flex-shrink:0;
+  width:clamp(52px,13vw,76px); aspect-ratio:140/120; margin:0;
+}
+.cat-float{position:absolute; inset:0; animation:cat-play 4.2s ease-in-out infinite;}
+.cat{position:absolute; inset:0; width:100%; height:100%; opacity:0; transition:opacity .65s var(--ease); overflow:visible;}
+body[data-mode="myla"] .cat--white{opacity:1;}
+body[data-mode="paanz"] .cat--black{opacity:1;}
+.cat--white{--cat-fill:#FFFFFF; --cat-line:#E2A9C6; --cat-eye:#3E1F2E; --cat-nose:#FF9EC0; --cat-blush:#FFB6CE;}
+.cat--black{--cat-fill:#20202E; --cat-line:rgba(168,182,255,.55); --cat-eye:#DCE3FF; --cat-nose:#C96E93; --cat-blush:#8B98FF; filter:drop-shadow(0 0 16px rgba(120,140,255,.30));}
+.cat__body,.cat__face,.cat__ear{fill:var(--cat-fill); stroke:var(--cat-line); stroke-width:2; stroke-linejoin:round;}
+.cat__tail{fill:none; stroke:var(--cat-fill); stroke-width:11; stroke-linecap:round;}
+.cat__paw{fill:var(--cat-fill); stroke:var(--cat-line); stroke-width:2;}
+.cat__eye{fill:var(--cat-eye);}
+.cat__nose{fill:var(--cat-nose);}
+.cat__blush{fill:var(--cat-blush); opacity:.5;}
+.cat__mouth,.cat__whiskers path{fill:none; stroke:var(--cat-line); stroke-width:1.7; stroke-linecap:round;}
+.cat__eye-line{fill:none; stroke:var(--cat-eye); stroke-width:2.6; stroke-linecap:round;}
+.cat__tail{transform-box:fill-box; transform-origin:0% 100%; animation:cat-tail 2.9s ease-in-out infinite;}
+.cat__body{transform-box:fill-box; transform-origin:center bottom; animation:cat-breathe 3.6s ease-in-out infinite;}
+.cat__head{transform-box:fill-box; transform-origin:center bottom; animation:cat-head 3.6s ease-in-out infinite;}
+.cat__eyes{transform-box:fill-box; transform-origin:center; animation:cat-blink 5.2s ease-in-out infinite;}
+@keyframes cat-tail{0%,100%{transform:rotate(0deg);} 50%{transform:rotate(-13deg);}}
+@keyframes cat-breathe{0%,100%{transform:scale(1,1);} 50%{transform:scale(1.022,1.038);}}
+@keyframes cat-head{0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-1.8px) rotate(-1.3deg);}}
+@keyframes cat-blink{0%,90%,100%{transform:scaleY(1);} 94%{transform:scaleY(.12);} 97%{transform:scaleY(1);}}
 
-  .page{
-    position: relative;
-    z-index: 1;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 56px 24px 80px;
-  }
+@keyframes cat-play{
+  0%, 100% { transform:translate(0,0) rotate(0deg); }
+  12%      { transform:translate(1px,-2px) rotate(-1deg); }
+  24%      { transform:translate(5px,-4px) rotate(6deg); }
+  36%      { transform:translate(-1px,-3px) rotate(-3deg); }
+  48%      { transform:translate(3px,-6px) rotate(4deg); }
+  60%      { transform:translate(0,-2px) rotate(0deg); }
+  72%      { transform:translate(2px,-3px) rotate(2deg); }
+  86%      { transform:translate(0,0) rotate(0deg); }
+}
+.cat-float.jump { animation: cat-jump 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+@keyframes cat-jump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-25px) scale(1.1); }
+  50% { transform: translateY(0) scale(0.95); }
+  70% { transform: translateY(-10px) scale(1.05); }
+}
 
-  header.hero{
-    margin-bottom: 30px;
-    text-align: center;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.cat-stage .cat__eyes--happy,
+.cat-stage .cat__eyes--sleep,
+.cat-stage .cat__eyes--angry { display: none; }
 
-  h1{
-    font-family: 'Fraunces', serif;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-size: clamp(2.2rem, 6vw, 3.2rem);
-    line-height: 1.05;
-    margin: 0;
-    letter-spacing: -0.01em;
-    color: var(--plum);
-  }
+.cat-stage.mood-happy .cat__eyes--open,
+.cat-stage.mood-sleeping .cat__eyes--open,
+.cat-stage.mood-angry .cat__eyes--open { display: none; }
+.cat-stage.mood-happy .cat__eyes--happy { display: block; }
+.cat-stage.mood-sleeping .cat__eyes--sleep { display: block; }
+.cat-stage.mood-angry .cat__eyes--angry { display: block; }
 
-  .hero-sub{
-    position: relative;
-    font-size: 1.02rem;
-    color: var(--plum-soft);
-    max-width: 46ch;
-    margin: 16px 0 0;
-    line-height: 1.55;
-    min-height: 1.65em;
-  }
+.cat-zzz{
+  position:absolute; top:-2px; right:-2px;
+  font-family:var(--font-display); font-weight:700; font-style:italic;
+  font-size:.85rem; line-height:1;
+  color:var(--accent); opacity:0; pointer-events:none;
+  text-shadow:0 2px 8px var(--shadow);
+}
+.cat-stage.mood-sleeping .cat-zzz{
+  animation:zzz-float 3.2s ease-in-out infinite;
+}
+@keyframes zzz-float{
+  0%   { opacity:0; transform:translate(0,0) scale(.6); }
+  20%  { opacity:1; transform:translate(-2px,-4px) scale(.9); }
+  60%  { opacity:.75; transform:translate(-6px,-13px) scale(1.1); }
+  100% { opacity:0; transform:translate(-11px,-22px) scale(1.35); }
+}
 
-  .motivation-text{
-    display: inline-block;
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .motivation-text.fading{
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.cat-stage.mood-sleeping .cat-float{ animation:cat-sleep 5.5s ease-in-out infinite; }
+.cat-stage.mood-sleeping .cat__tail{ animation:cat-tail-sleep 5.5s ease-in-out infinite; }
+.cat-stage.mood-sleeping .cat__head{ animation:none; }
+.cat-stage.mood-sleeping .cat__eyes{ animation:none; }
+.cat-stage.mood-sleeping .cat__body{ animation:cat-breathe-slow 5.5s ease-in-out infinite; }
+@keyframes cat-sleep{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  50%    { transform:translateY(1.6px) rotate(-1deg); }
+}
+@keyframes cat-tail-sleep{
+  0%,100%{ transform:rotate(0deg); }
+  50%    { transform:rotate(-4deg); }
+}
+@keyframes cat-breathe-slow{
+  0%,100%{ transform:scale(1,1); }
+  50%    { transform:scale(1.028,1.05); }
+}
+.cat-stage.mood-angry .cat__tail{ animation-duration:1s; }
+.cat-stage.mood-angry .cat__head{ animation:cat-head-angry .8s ease-in-out infinite; }
+@keyframes cat-head-angry{
+  0%,100%{ transform:translate(0,0) rotate(0deg); }
+  25%    { transform:translate(-1px,0) rotate(-2.5deg); }
+  75%    { transform:translate(1px,0) rotate(2.5deg); }
+}
+.cat-stage.mood-happy .cat-float{
+  animation:cat-happy 1.3s cubic-bezier(.36,1.4,.4,1) infinite;
+}
+@keyframes cat-happy{
+  0%,100%{ transform:translateY(0) scale(1); }
+  30%    { transform:translateY(-9px) scale(1.06); }
+  60%    { transform:translateY(0) scale(.96); }
+  80%    { transform:translateY(-3px) scale(1.02); }
+}
+.cat-stage.mood-smile .cat__tail{ animation-duration:2s; }
 
-  /* Tab switcher */
-  .tab-switch{
-    position: relative;
-    display: inline-flex;
-    background: rgba(255,255,255,0.55);
-    border: 1.5px solid rgba(255,255,255,0.7);
-    border-radius: 999px;
-    padding: 5px;
-    margin: 28px auto 0;
-    box-shadow: 0 10px 30px -14px var(--shadow-color);
-  }
-  .tab-thumb{
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: calc(50% - 5px);
-    height: calc(100% - 10px);
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
-    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    z-index: 0;
-  }
-  .tab-switch[data-active="myla"] .tab-thumb{ transform: translateX(100%); }
+.count-ball-scene{
+  position:relative;
+  width:clamp(46px,12vw,60px);
+  height:clamp(56px,14vw,72px);
+  display:flex; align-items:flex-end; justify-content:center;
+  flex-shrink:0;
+}
+.count-ball{
+  position:relative; z-index:1;
+  width:clamp(44px,11.5vw,56px);
+  height:clamp(44px,11.5vw,56px);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(1.05rem,4vw,1.4rem);
+  color:var(--on-accent);
+  letter-spacing:-.02em;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.75), rgba(255,255,255,.15) 42%, transparent 62%),
+    linear-gradient(140deg, var(--accent), var(--accent-deep));
+  box-shadow:
+    0 8px 18px -8px var(--shadow),
+    inset 0 -6px 12px rgba(0,0,0,.18),
+    inset 0 4px 8px rgba(255,255,255,.35);
+  animation:ball-play 4.2s ease-in-out infinite;
+  will-change:transform;
+  user-select:none;
+}
+.count-ball-shadow{
+  position:absolute;
+  bottom:0; left:50%;
+  width:74%; height:7px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(ellipse at center, var(--shadow), transparent 72%);
+  animation:ball-shadow 4.2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes ball-play{
+  0%, 100% { transform:translate(0,0) scale(1); }
+  12%      { transform:translate(-2px,-5px) scale(1.04); }
+  24%      { transform:translate(6px,-9px) scale(1.06); }
+  36%      { transform:translate(-3px,-3px) scale(.97); }
+  48%      { transform:translate(4px,-8px) scale(1.05); }
+  60%      { transform:translate(-1px,-2px) scale(.99); }
+  72%      { transform:translate(2px,-4px) scale(1.02); }
+  86%      { transform:translate(0,-1px) scale(1); }
+}
+@keyframes ball-shadow{
+  0%, 100% { transform:translateX(-50%) scale(1);   opacity:.85; }
+  12%      { transform:translateX(-50%) scale(.78); opacity:.5;  }
+  24%      { transform:translateX(-50%) scale(.55); opacity:.32; }
+  36%      { transform:translateX(-50%) scale(.95); opacity:.75; }
+  48%      { transform:translateX(-50%) scale(.62); opacity:.4;  }
+  60%      { transform:translateX(-50%) scale(.98); opacity:.8;  }
+  72%      { transform:translateX(-50%) scale(.85); opacity:.6;  }
+  86%      { transform:translateX(-50%) scale(1);   opacity:.85; }
+}
+.count-ball.pop{ animation:ball-pop .75s var(--ease) 1; }
+@keyframes ball-pop{
+  0%   { transform:scale(1)   translateY(0); }
+  30%  { transform:scale(1.22) translateY(-12px); }
+  55%  { transform:scale(.92) translateY(2px); }
+  78%  { transform:scale(1.06) translateY(-3px); }
+  100% { transform:scale(1)   translateY(0); }
+}
+.count-ball-scene.pop .count-ball-shadow{ animation:shadow-pop .75s var(--ease) 1; }
+@keyframes shadow-pop{
+  0%   { transform:translateX(-50%) scale(1);   opacity:.85; }
+  30%  { transform:translateX(-50%) scale(.5);  opacity:.3;  }
+  60%  { transform:translateX(-50%) scale(1.1); opacity:.9;  }
+  100% { transform:translateX(-50%) scale(1);   opacity:.85; }
+}
 
-  .tab-btn{
-    position: relative;
-    z-index: 1;
-    border: none;
-    background: transparent;
-    font-family: 'Manrope', sans-serif;
-    font-weight: 700;
-    font-size: 0.92rem;
-    color: var(--plum-soft);
-    padding: 11px 26px;
-    border-radius: 999px;
-    cursor: pointer;
-    display:flex;
-    align-items:center;
-    gap: 8px;
-    transition: color 0.3s ease;
-  }
-  .tab-btn.active{ color: var(--white); }
-  .tab-btn .tab-dot{
-    width: 7px; height: 7px; border-radius: 50%;
-    background: currentColor;
-    opacity: 0.5;
-  }
-  .tab-btn .tab-count{
-    font-size: 0.76rem;
-    opacity: 0.85;
-    font-weight: 800;
-  }
+.add-row{display:flex; flex-direction:column; gap:8px; margin-bottom:10px; position:relative; z-index:1;}
+.add-row-main{display:flex; gap:8px; align-items:stretch;}
+.add-field{
+  flex:1; min-width:0; display:flex; align-items:center;
+  background:var(--card); border:1.5px solid transparent;
+  border-radius:var(--radius-sm);
+  transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.add-field:focus-within{
+  border-color:var(--accent); background:var(--card-hover);
+  box-shadow:0 0 0 4px var(--focus-ring);
+}
+.add-input{
+  flex:1; min-width:0; border:none; background:transparent;
+  padding:13px 4px 13px 15px; font-family:inherit; font-size:.94rem;
+  color:var(--ink); outline:none;
+}
+.add-input::placeholder{color:var(--ink-faint);}
 
-  /* Board / carousel */
-  .board{
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 18px 50px -18px var(--shadow-color), 0 2px 8px rgba(62,31,46,0.06);
-  }
-  .board-track{
-    display:flex;
-    width: 200%;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .board[data-active="myla"] .board-track{ transform: translateX(-50%); }
+.attach-btn{
+  position:relative; flex-shrink:0; width:44px; height:44px; margin-right:3px;
+  border:none; background:transparent; color:var(--ink-soft);
+  border-radius:11px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:color .2s ease, background .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.attach-btn svg{width:20px; height:20px;}
+.attach-btn:hover{color:var(--accent); background:var(--card-hover);}
+.attach-btn:active{transform:scale(.92);}
+.attach-btn.has-file{color:var(--accent);}
+.attach-count{
+  position:absolute; top:2px; right:2px; min-width:17px; height:17px; padding:0 4px;
+  border-radius:999px; background:var(--accent); color:var(--on-accent);
+  font-size:.62rem; font-weight:800; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.28); pointer-events:none;
+}
+.add-btn{
+  flex-shrink:0; border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  color:var(--on-accent); font-weight:700; font-size:.9rem;
+  padding:0 clamp(14px,4vw,22px); border-radius:var(--radius-sm);
+  cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, filter .15s ease, opacity .2s ease;
+  box-shadow:0 10px 22px -10px var(--accent-deep);
+  -webkit-tap-highlight-color:transparent;
+}
+.add-btn:hover{transform:translateY(-1px); filter:brightness(1.06);}
+.add-btn:active{transform:translateY(0) scale(.97);}
+.add-btn:disabled{opacity:.55; cursor:not-allowed; transform:none;}
 
-  .panel{
-    width: 50%;
-    flex-shrink: 0;
-    padding: 28px 26px 26px;
-    position: relative;
-    overflow: hidden;
-    display:flex;
-    flex-direction: column;
-    min-height: 440px;
-  }
+.add-options{display:flex; gap:8px; flex-wrap:wrap;}
+.select-wrapper { position: relative; flex: 1; min-width: 140px; display: flex; align-items: center; }
+.select-wrapper::after {
+  content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 6px solid var(--ink-soft); pointer-events: none;
+}
+.add-select {
+  width: 100%; padding: 10px 30px 10px 12px; font-family: inherit; font-size: .85rem;
+  border-radius: var(--radius-sm); border: 1.5px solid var(--line);
+  background: var(--card); color: var(--ink); outline: none;
+  -webkit-appearance: none; appearance: none;
+  transition: border-color .2s ease, background .2s ease;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.add-select:focus { border-color: var(--accent); background: var(--card-hover); }
+.add-select option { background-color: #1C1C2A; color: #ECEEF6; }
+body[data-mode="myla"] .add-select option { background-color: #FFFFFF; color: #3E1F2E; }
 
-  .panel.paan{
-    background: linear-gradient(150deg, #FFEDF3 0%, var(--panel-paan) 60%, #FFCFE2 100%);
-  }
-  .panel.myla{
-    background: linear-gradient(150deg, #FFE7F1 0%, var(--panel-myla) 60%, #FFC3DE 100%);
-  }
+.add-date {
+  flex: 1; min-width: 140px; padding: 10px 12px; font-family: inherit; font-size: .85rem;
+  border-radius: var(--radius-sm); border: 1.5px solid var(--line);
+  background: var(--card); color: var(--ink); outline: none;
+  transition: border-color .2s ease, background .2s ease;
+}
+.add-date:focus { border-color: var(--accent); background: var(--card-hover); }
+.add-date::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: invert(0.8); }
 
-  .panel-glow{
-    position:absolute;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, transparent 72%);
-    top: -80px;
-    right: -60px;
-    pointer-events:none;
-  }
+.course-menu{
+  display:flex; gap:7px; align-items:center;
+  overflow-x:auto; overflow-y:hidden;
+  padding:2px 2px 10px; margin:0 -2px 6px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line) transparent;
+  -webkit-overflow-scrolling:touch;
+  position:relative; z-index:1;
+  scroll-behavior:smooth;
+  mask-image:linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+}
+.course-menu::-webkit-scrollbar{height:5px;}
+.course-menu::-webkit-scrollbar-thumb{background:var(--line); border-radius:999px;}
+.course-menu::-webkit-scrollbar-track{background:transparent;}
 
-  .panel-header{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    position: relative;
-    z-index: 1;
-    gap: 14px;
-  }
+.course-chip{
+  flex-shrink:0;
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 13px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:var(--card);
+  color:var(--ink-soft);
+  font-family:inherit;
+  font-size:.78rem;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all .22s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+}
+.course-chip:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  transform:translateY(-1px);
+}
+.course-chip:active{transform:translateY(0) scale(.97);}
+.course-chip.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  border-color:var(--accent-deep);
+  color:var(--on-accent);
+  box-shadow:0 8px 18px -10px var(--accent-deep);
+}
+.course-chip-count{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:20px; height:20px;
+  padding:0 6px;
+  border-radius:999px;
+  font-size:.68rem; font-weight:800;
+  background:var(--card-hover);
+  color:var(--accent-deep);
+  transition:background .22s ease, color .22s ease;
+}
+.course-chip.active .course-chip-count{
+  background:rgba(255,255,255,.28);
+  color:var(--on-accent);
+}
 
-  .owner-block{
-    display:flex;
-    align-items:center;
-    gap: 14px;
-  }
+.course-group { margin-bottom: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px; background: var(--card); }
+.course-title { font-weight: 800; font-size: 1rem; margin: 0 0 10px 0; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.course-title::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 
-  .owner-name{
-    font-family:'Fraunces', serif;
-    font-weight: 600;
-    font-size: 1.6rem;
-    margin: 0;
-    color: var(--plum);
-  }
+.task-timer { font-size: 0.75rem; font-weight: 700; margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: var(--card-hover); align-self:flex-start; }
+.task-timer.on-time { color: var(--accent-deep); }
+.task-timer.late { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); animation: pulse-red 1.5s infinite; }
+@keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.task-timer.done-timer { color: var(--ink-faint); text-decoration: line-through; background: transparent; padding: 0; }
 
-  .owner-meta{
-    font-size: 0.84rem;
-    color: var(--plum-soft);
-    margin-top: 3px;
-  }
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 14px; position: relative; z-index: 1; }
+.filter-btn { border: 1px solid var(--line); background: var(--card); color: var(--ink-soft); font-weight: 700; font-size: 0.75rem; padding: 7px 15px; border-radius: 999px; cursor: pointer; transition: all .2s ease; }
+.filter-btn:hover{border-color:var(--accent); color:var(--accent);}
+.filter-btn.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 
-  .count-badge{
-    background: var(--white);
-    color: var(--rose-deep);
-    font-weight: 700;
-    font-size: 0.8rem;
-    padding: 6px 12px;
-    border-radius: 999px;
-    box-shadow: 0 4px 12px rgba(196,62,112,0.15);
-    min-width: 34px;
-    text-align:center;
-  }
+.pending{position:relative; z-index:1; margin:0 0 10px;}
+.pending-list{display:flex; flex-direction:column; gap:6px;}
+.pending-inner{
+  display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px dashed var(--panel-border);
+  border-radius:var(--radius-sm); padding:8px 10px;
+  animation:pending-in .3s var(--ease) both;
+}
+@keyframes pending-in{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);}}
+.pending-thumb{width:40px; height:40px; border-radius:9px; object-fit:cover; flex-shrink:0; background:var(--card-hover);}
+.pending-icon{
+  width:40px; height:40px; border-radius:9px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card-hover); color:var(--accent);
+}
+.pending-icon svg{width:20px; height:20px;}
+.pending-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;}
+.pending-name{font-size:.83rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.pending-size{font-size:.73rem; color:var(--ink-soft);}
+.pending-remove{
+  flex-shrink:0; width:34px; height:34px;
+  border:1px solid var(--line); background:var(--card-hover);
+  color:var(--ink-soft); border-radius:10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.pending-remove svg{width:16px; height:16px;}
+.pending-remove:hover{background:var(--accent); color:var(--on-accent); border-color:var(--accent);}
+.pending-remove:active{transform:scale(.93);}
 
-  /* Mascot */
-  .mascot{
-    width: 54px;
-    height: 54px;
-    flex-shrink: 0;
-    position: relative;
-  }
-  .mascot-face{
-    width: 100%;
-    height: 100%;
-    display:block;
-    transition: transform 0.25s ease;
-  }
-  .face-bg{ fill: var(--mood-neutral); transition: fill 0.45s ease; }
-  .eye{ fill: var(--plum); transition: transform 0.25s ease; }
-  .cheek{ fill: #FF9EBA; opacity: 0; transition: opacity 0.4s ease; }
-  .brow{
-    stroke: var(--plum);
-    stroke-width: 3;
-    stroke-linecap: round;
-    fill: none;
-    opacity: 0;
-    transition: opacity 0.3s ease, d 0.3s ease;
-  }
-  .mouth{
-    stroke: var(--plum);
-    stroke-width: 3;
-    stroke-linecap: round;
-    fill: none;
-    transition: d 0.35s ease;
-  }
+.clear-all-container{margin-bottom:14px; display:flex; justify-content:flex-end; position:relative; z-index:1;}
+.clear-all-btn{
+  border:none; background:var(--card); color:var(--ink-soft);
+  font-weight:700; font-size:.76rem; padding:8px 14px;
+  border-radius:var(--radius-sm); cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+  transition:background .25s ease, color .25s ease, transform .2s ease, opacity .25s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.clear-all-btn svg{width:14px; height:14px;}
+.clear-all-btn:not(:disabled):hover{background:var(--accent); color:var(--on-accent); transform:translateY(-1px);}
+.clear-all-btn:disabled{opacity:.35; cursor:not-allowed;}
 
-  .mascot.mood-neutral .face-bg{ fill: var(--mood-neutral); }
-  .mascot.mood-angry .face-bg{ fill: var(--mood-angry); }
-  .mascot.mood-smile .face-bg{ fill: var(--mood-smile); }
-  .mascot.mood-happy .face-bg{ fill: var(--mood-happy); }
+.task-list{
+  list-style:none; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:8px;
+  position:relative; z-index:1;
+}
+.task-item{
+  display:flex; align-items:flex-start; gap:11px;
+  background:var(--card); border:1px solid transparent;
+  border-radius:var(--radius-md); padding:11px 12px;
+  transition:background .2s ease, border-color .2s ease, box-shadow .2s ease, opacity .38s ease, transform .38s ease;
+}
+.task-item:hover{
+  background:var(--card-hover); border-color:var(--line);
+  box-shadow:0 6px 18px -12px var(--shadow);
+}
+.task-item.clearing{opacity:0; transform:translateY(-12px) scale(.96);}
 
-  .mascot.mood-angry .brow{ opacity: 1; }
-  .mascot.mood-happy .cheek{ opacity: 0.9; }
+.checkbox{
+  width:26px; height:26px; flex-shrink:0; margin-top:1px; padding:0;
+  border-radius:9px; border:2px solid var(--accent-soft); background:var(--card-hover);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, border-color .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.checkbox:hover{border-color:var(--accent);}
+.checkbox:active{transform:scale(.9);}
+.checkbox.checked{background:linear-gradient(135deg,var(--accent),var(--accent-deep)); border-color:var(--accent-deep);}
+.checkbox svg{width:15px; height:15px; opacity:0; transition:opacity .2s ease;}
+.checkbox.checked svg{opacity:1;}
 
-  @keyframes mascot-shake{
-    0%,100%{ transform: translateX(0) rotate(0deg); }
-    25%{ transform: translateX(-1.5px) rotate(-3deg); }
-    75%{ transform: translateX(1.5px) rotate(3deg); }
-  }
-  .mascot.mood-angry .mascot-face{ animation: mascot-shake 0.45s ease-in-out infinite; }
+.task-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px;}
+.task-text{font-size:.94rem; line-height:1.45; color:var(--ink); word-break:break-word; overflow-wrap:anywhere;}
+.task-item.done .task-text{color:var(--ink-faint); text-decoration:line-through; text-decoration-color:var(--ink-faint);}
 
-  @keyframes mascot-sway{
-    0%,100%{ transform: translateY(0) rotate(0deg); }
-    50%{ transform: translateY(-3px) rotate(2deg); }
-  }
-  .mascot.mood-smile .mascot-face{ animation: mascot-sway 2.6s ease-in-out infinite; }
+.attach-list{display:flex; flex-wrap:wrap; gap:6px;}
+.attach-chip{
+  display:inline-flex; align-items:center; gap:8px;
+  max-width:100%; border:1px solid var(--line); background:var(--card-hover);
+  border-radius:11px; padding:5px 12px 5px 5px; cursor:pointer;
+  color:var(--ink-soft); font-family:inherit;
+  transition:background .2s ease, border-color .2s ease, transform .15s ease, color .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.attach-chip:hover{background:var(--card); border-color:var(--accent); color:var(--accent); transform:translateY(-1px);}
+.attach-chip:active{transform:scale(.97);}
+.attach-thumb{width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0; display:block; background:var(--card-hover);}
+.attach-icon{
+  width:34px; height:34px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card); color:var(--accent);
+}
+.attach-icon svg{width:17px; height:17px;}
+.attach-name{
+  font-size:.79rem; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:22ch;
+  color:inherit;
+}
+.attach-chip.uploading{opacity:.75; cursor:wait; pointer-events:none;}
+.attach-chip.uploading .attach-icon svg{animation:attach-spin .9s linear infinite;}
+@keyframes attach-spin { to { transform: rotate(360deg); } }
 
-  @keyframes mascot-bounce{
-    0%,100%{ transform: translateY(0) scale(1); }
-    30%{ transform: translateY(-7px) scale(1.06); }
-    55%{ transform: translateY(0) scale(0.96); }
-    75%{ transform: translateY(-2px) scale(1.02); }
-  }
-  .mascot.mood-happy .mascot-face{ animation: mascot-bounce 1.5s cubic-bezier(.36,1.4,.4,1) infinite; }
+.delete-btn{
+  flex-shrink:0; width:38px; height:38px;
+  border:1px solid var(--line); background:var(--card-hover);
+  color:var(--ink-soft); border-radius:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .18s ease, color .18s ease, border-color .18s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.delete-btn svg{width:18px; height:18px;}
+.delete-btn:hover{background:var(--accent); border-color:var(--accent); color:var(--on-accent); transform:translateY(-1px);}
+.delete-btn:active{transform:scale(.93);}
 
-  .sparkle{
-    position: absolute;
-    width: 8px; height: 8px;
-    top: 50%; left: 50%;
-    margin: -4px 0 0 -4px;
-    background: radial-gradient(circle, #FFF1B8 0%, #FFCA4A 70%, transparent 100%);
-    border-radius: 50%;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .mascot.celebrate .sparkle{ animation: sparkle-pop 0.9s ease-out forwards; }
-  .mascot.celebrate .sparkle:nth-child(1){ animation-delay: 0s; }
-  .mascot.celebrate .sparkle:nth-child(2){ animation-delay: 0.08s; }
-  .mascot.celebrate .sparkle:nth-child(3){ animation-delay: 0.16s; }
-  .mascot.celebrate .sparkle:nth-child(4){ animation-delay: 0.05s; }
-  .mascot.celebrate .sparkle:nth-child(5){ animation-delay: 0.12s; }
-  .mascot.celebrate .sparkle:nth-child(6){ animation-delay: 0.2s; }
-  @keyframes sparkle-pop{
-    0%{ opacity: 0; transform: translate(0,0) scale(0.3); }
-    35%{ opacity: 1; }
-    100%{ opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
-  }
-  .sparkle:nth-child(1){ --tx: -26px; --ty: -22px; }
-  .sparkle:nth-child(2){ --tx: 0px; --ty: -32px; }
-  .sparkle:nth-child(3){ --tx: 26px; --ty: -22px; }
-  .sparkle:nth-child(4){ --tx: -24px; --ty: 18px; }
-  .sparkle:nth-child(5){ --tx: 0px; --ty: 30px; }
-  .sparkle:nth-child(6){ --tx: 24px; --ty: 18px; }
+.empty-state{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:34px 12px; color:var(--ink-soft);
+  position:relative; z-index:1;
+}
+.empty-state svg{width:44px; height:44px; opacity:.5; margin-bottom:12px;}
+.empty-state p{margin:0; font-size:.88rem; max-width:26ch; line-height:1.6;}
+.lightbox{
+  position:fixed; inset:0; z-index:60;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  background:rgba(8,7,12,.86);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  opacity:0; pointer-events:none; transition:opacity .3s var(--ease);
+}
+.lightbox.open{opacity:1; pointer-events:auto;}
+.lightbox img{
+  max-width:100%; max-height:100%; border-radius:14px;
+  box-shadow:0 30px 70px rgba(0,0,0,.6);
+  transform:scale(.96); transition:transform .3s var(--ease);
+}
+.lightbox.open img{transform:scale(1);}
+.lightbox-close{
+  position:absolute; top:calc(16px + env(safe-area-inset-top)); right:16px;
+  width:44px; height:44px; border-radius:50%; border:none;
+  background:rgba(255,255,255,.16); color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease;
+}
+.lightbox-close:hover{background:rgba(255,255,255,.28);}
+.lightbox-close svg{width:19px; height:19px;}
+.toast{
+  position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translate(-50%,16px); z-index:80;
+  background:#241826; color:#fff; font-size:.82rem; font-weight:600;
+  padding:11px 18px; border-radius:999px;
+  box-shadow:0 14px 34px rgba(0,0,0,.35);
+  opacity:0; pointer-events:none;
+  transition:opacity .3s var(--ease), transform .3s var(--ease);
+  max-width:min(88vw,420px); text-align:center;
+}
+.toast.show{opacity:1; transform:translate(-50%,0);}
 
-  .add-row{
-    display:flex;
-    gap: 10px;
-    margin-bottom: 12px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .add-row input[type="text"]{
-    flex: 1;
-    border: 1.5px solid transparent;
-    background: rgba(255,255,255,0.75);
-    border-radius: var(--radius-sm);
-    padding: 13px 16px;
-    font-family: 'Manrope', sans-serif;
-    font-size: 0.96rem;
-    color: var(--plum);
-    outline: none;
-    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  }
-  .add-row input[type="text"]::placeholder{ color: #B98098; }
-  .add-row input[type="text"]:focus{
-    border-color: var(--rose-mid);
-    background: var(--white);
-    box-shadow: 0 0 0 4px rgba(232,85,138,0.14);
-  }
-
-  .add-btn{
-    border: none;
-    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
-    color: var(--white);
-    font-weight: 700;
-    font-size: 0.92rem;
-    padding: 0 22px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    box-shadow: 0 8px 18px -6px rgba(196,62,112,0.55);
-  }
-  .add-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
-  .add-btn:active{ transform: translateY(0px) scale(0.97); }
-
-  /* Clear All Action Bar (Top) */
-  .clear-all-container {
-    margin-bottom: 18px;
-    display: flex;
-    justify-content: flex-end;
-    position: relative;
-    z-index: 1;
-  }
-  .clear-all-btn {
-    border: none;
-    background: rgba(196, 62, 112, 0.1);
-    color: var(--rose-deep);
-    font-family: 'Manrope', sans-serif;
-    font-weight: 700;
-    font-size: 0.81rem;
-    padding: 7px 14px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.25s ease;
-  }
-  .clear-all-btn svg {
-    width: 13px;
-    height: 13px;
-  }
-  .clear-all-btn:not(:disabled):hover {
-    background: var(--rose-deep);
-    color: var(--white);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(196,62,112,0.25);
-  }
-  .clear-all-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    background: rgba(62, 31, 46, 0.04);
-    color: var(--plum-soft);
-  }
-
-  /* Sections for Task Groups */
-  .task-section-title {
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--plum-soft);
-    margin: 14px 0 6px 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .task-section-title:first-of-type {
-    margin-top: 0;
-  }
-
-  .task-list{
-    list-style:none;
-    margin:0;
-    padding:0;
-    display:flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .task-item{
-    display:flex;
-    align-items:center;
-    gap: 12px;
-    background: rgba(255,255,255,0.72);
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
-    transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.4s ease, transform 0.4s ease;
-  }
-
-  .task-item.clearing {
-    opacity: 0;
-    transform: translateY(-12px) scale(0.96);
-  }
-
-  .task-item:hover{
-    background: rgba(255,255,255,0.92);
-    box-shadow: 0 4px 12px rgba(62,31,46,0.06);
-  }
-
-  .checkbox{
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    border: 2px solid var(--rose-soft);
-    flex-shrink: 0;
-    cursor: pointer;
-    position: relative;
-    background: var(--white);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .checkbox.checked{
-    background: linear-gradient(135deg, var(--rose-mid), var(--rose-deep));
-    border-color: var(--rose-deep);
-  }
-  .checkbox svg{
-    width: 13px;
-    height: 13px;
-    opacity: 0;
-  }
-  .checkbox.checked svg{ opacity: 1; }
-
-  .task-text{
-    flex: 1;
-    font-size: 0.97rem;
-    line-height: 1.4;
-    color: var(--plum);
-    word-break: break-word;
-  }
-  .task-item.done .task-text{
-    color: #B591A2;
-    text-decoration: line-through;
-    text-decoration-color: #C99DB2;
-  }
-
-  .delete-btn{
-    border: none;
-    background: transparent;
-    color: #C08199;
-    cursor: pointer;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    transition: background 0.15s ease, color 0.15s ease;
-    opacity: 0;
-  }
-  .task-item:hover .delete-btn,
-  .task-item:focus-within .delete-btn{ opacity: 1; }
-  .delete-btn:hover{ background: rgba(196,62,112,0.12); color: var(--rose-deep); }
-  .delete-btn svg{ width: 15px; height: 15px; }
-
-  .empty-state{
-    flex: 1;
-    display:flex;
-    flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding: 30px 10px;
-    color: var(--plum-soft);
-    position: relative;
-    z-index: 1;
-  }
-  .empty-state svg{ width: 46px; height: 46px; opacity: 0.55; margin-bottom: 12px; }
-  .empty-state p{ margin: 0; font-size: 0.92rem; max-width: 26ch; line-height: 1.5; }
-
-  ::selection{ background: var(--rose-soft); color: var(--plum); }
+@media (max-width:480px){
+  .add-row-main{flex-wrap:wrap;}
+  .add-field{flex:1 1 100%;}
+  .add-btn{flex:1 1 100%; padding:12px 18px;}
+  .add-options{flex-direction:column;}
+  .select-wrapper, .add-date { width: 100%; }
+  .tab-dot{display:none;}
+  .attach-name{max-width:16ch;}
+}
+@media (max-width:400px){
+  .tab-switch{--tab-pad:4px;}
+  .tab-btn{padding:9px 10px; font-size:.74rem; gap:5px;}
+  .cat-stage{width:48px;}
+  .count-ball-scene{width:42px; height:52px;}
+  .count-ball{width:40px; height:40px; font-size:1rem;}
+  .task-item{gap:9px; padding:10px;}
+  .delete-btn{width:36px; height:36px;}
+  .course-chip{padding:7px 11px; font-size:.74rem;}
+}
+@media (min-width:900px){ .page{max-width:800px;} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+}
 </style>
 </head>
-<body>
+<body data-mode="myla">
 
-<div class="backdrop-orb orb-1"></div>
-<div class="backdrop-orb orb-2"></div>
+<div class="bg-layer bg-layer--myla"></div>
+<div class="bg-layer bg-layer--paanz"></div>
 
 <div class="page">
-
   <header class="hero">
     <h1>Nugas Mahasigma</h1>
     <p class="hero-sub"><span class="motivation-text" id="motivationText">Adaaa akuuu sayangggggg</span></p>
@@ -570,37 +748,149 @@
         <div class="panel-glow"></div>
         <div class="panel-header">
           <div class="owner-block">
-            <div class="mascot mood-neutral" id="paanMascot" aria-hidden="true">
-              <svg class="mascot-face" viewBox="0 0 64 64">
-                <circle class="face-bg" cx="32" cy="32" r="30"/>
-                <path class="brow brow-l" id="paanBrowL" d="M15 20 L27 25"/>
-                <path class="brow brow-r" id="paanBrowR" d="M49 20 L37 25"/>
-                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
-                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
-                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
-                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
-                <path class="mouth" id="paanMouth" d="M23 40 Q32 40 41 40"/>
-              </svg>
-              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
-              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
-            </div>
             <div>
               <p class="owner-name">Paan</p>
-              <p class="owner-meta" id="paanMeta">Menghubungkan...</p>
+              <p class="owner-meta" id="paanMeta">Menghubungkan…</p>
             </div>
           </div>
-          <div class="count-badge" id="paanCount">0</div>
         </div>
-        <form class="add-row" id="paanForm">
-          <input type="text" id="paanInput" placeholder="Tambah tugas untuk Paan" maxlength="140" autocomplete="off">
-          <button type="submit" class="add-btn">Tambah</button>
+
+        <div class="panel-play-scene">
+          <div class="cat-stage mood-sleeping" id="paanCatStage" aria-hidden="true">
+            <div class="cat-float" id="paanCatFloat">
+              <svg class="cat cat--white" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+                <path class="cat__tail" d="M96 96 C 122 100, 132 76, 114 56"/>
+                <ellipse class="cat__body" cx="66" cy="88" rx="29" ry="25"/>
+                <ellipse class="cat__paw" cx="52" cy="110" rx="11" ry="7"/>
+                <ellipse class="cat__paw" cx="80" cy="110" rx="11" ry="7"/>
+                <g class="cat__head">
+                  <path class="cat__ear" d="M45 34 L41 12 L64 26 Z"/>
+                  <path class="cat__ear" d="M87 34 L91 12 L68 26 Z"/>
+                  <circle class="cat__face" cx="66" cy="48" r="26"/>
+                  <g class="cat__eyes cat__eyes--open">
+                    <ellipse class="cat__eye" cx="55" cy="47" rx="3.4" ry="4.6"/>
+                    <ellipse class="cat__eye" cx="77" cy="47" rx="3.4" ry="4.6"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--happy">
+                    <path class="cat__eye-line" d="M49 48 Q55 41 61 48"/>
+                    <path class="cat__eye-line" d="M71 48 Q77 41 83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--sleep">
+                    <path class="cat__eye-line" d="M49 48 L61 48"/>
+                    <path class="cat__eye-line" d="M71 48 L83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--angry">
+                    <path class="cat__eye-line" d="M49 50 L61 45"/>
+                    <path class="cat__eye-line" d="M71 45 L83 50"/>
+                  </g>
+                  <ellipse class="cat__blush" cx="47" cy="57" rx="5" ry="3"/>
+                  <ellipse class="cat__blush" cx="85" cy="57" rx="5" ry="3"/>
+                  <path class="cat__nose" d="M62.4 54.6h7.2l-3.6 3.8z"/>
+                  <path class="cat__mouth" d="M66 58.4v2.6"/>
+                  <path class="cat__mouth" d="M66 61q-3.6 3.4-7 .6"/>
+                  <path class="cat__mouth" d="M66 61q3.6 3.4 7 .6"/>
+                  <g class="cat__whiskers">
+                    <path d="M42 52 L26 48"/><path d="M42 57 L26 60"/>
+                    <path d="M90 52 L106 48"/><path d="M90 57 L106 60"/>
+                  </g>
+                </g>
+              </svg>
+              <svg class="cat cat--black" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+                <path class="cat__tail" d="M96 96 C 122 100, 132 76, 114 56"/>
+                <ellipse class="cat__body" cx="66" cy="88" rx="29" ry="25"/>
+                <ellipse class="cat__paw" cx="52" cy="110" rx="11" ry="7"/>
+                <ellipse class="cat__paw" cx="80" cy="110" rx="11" ry="7"/>
+                <g class="cat__head">
+                  <path class="cat__ear" d="M45 34 L41 12 L64 26 Z"/>
+                  <path class="cat__ear" d="M87 34 L91 12 L68 26 Z"/>
+                  <circle class="cat__face" cx="66" cy="48" r="26"/>
+                  <g class="cat__eyes cat__eyes--open">
+                    <ellipse class="cat__eye" cx="55" cy="47" rx="3.4" ry="4.6"/>
+                    <ellipse class="cat__eye" cx="77" cy="47" rx="3.4" ry="4.6"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--happy">
+                    <path class="cat__eye-line" d="M49 48 Q55 41 61 48"/>
+                    <path class="cat__eye-line" d="M71 48 Q77 41 83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--sleep">
+                    <path class="cat__eye-line" d="M49 48 L61 48"/>
+                    <path class="cat__eye-line" d="M71 48 L83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--angry">
+                    <path class="cat__eye-line" d="M49 50 L61 45"/>
+                    <path class="cat__eye-line" d="M71 45 L83 50"/>
+                  </g>
+                  <ellipse class="cat__blush" cx="47" cy="57" rx="5" ry="3"/>
+                  <ellipse class="cat__blush" cx="85" cy="57" rx="5" ry="3"/>
+                  <path class="cat__nose" d="M62.4 54.6h7.2l-3.6 3.8z"/>
+                  <path class="cat__mouth" d="M66 58.4v2.6"/>
+                  <path class="cat__mouth" d="M66 61q-3.6 3.4-7 .6"/>
+                  <path class="cat__mouth" d="M66 61q3.6 3.4 7 .6"/>
+                  <g class="cat__whiskers">
+                    <path d="M42 52 L26 48"/><path d="M42 57 L26 60"/>
+                    <path d="M90 52 L106 48"/><path d="M90 57 L106 60"/>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <span class="cat-zzz">z</span>
+          </div>
+
+          <div class="count-ball-scene" id="paanBallScene">
+            <div class="count-ball-shadow"></div>
+            <div class="count-ball" id="paanBall">
+              <span id="paanBallNum">0</span>
+            </div>
+          </div>
+        </div>
+
+        <form class="add-row" id="paanForm" autocomplete="off">
+          <div class="add-row-main">
+            <div class="add-field">
+              <input type="text" class="add-input" id="paanInput" placeholder="Tambah tugas untuk Paan" maxlength="140">
+              <button type="button" class="attach-btn" id="paanAttachBtn" aria-label="Lampirkan gambar atau file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <span class="attach-count" id="paanAttachCount" hidden>0</span>
+              </button>
+            </div>
+            <button type="submit" class="add-btn">Tambah</button>
+          </div>
+          <div class="add-options">
+            <div class="select-wrapper">
+              <select class="add-select" id="paanCourse" required>
+                <option value="" disabled selected>Pilih Mata Kuliah...</option>
+                <option value="Statistika">Statistika</option>
+                <option value="Desain UI/UX">Desain UI/UX</option>
+                <option value="Pemrograman Web">Pemrograman Web</option>
+                <option value="Basis Data Lanjut">Basis Data Lanjut</option>
+                <option value="Praktikum Pemrograman Berorientasi Objek">Praktikum Pemrograman Berorientasi Objek</option>
+                <option value="Pemrograman Berorientasi Objek">Pemrograman Berorientasi Objek</option>
+                <option value="Rekayasa Perangkat Lunak">Rekayasa Perangkat Lunak</option>
+                <option value="Praktikum Jaringan Komputer">Praktikum Jaringan Komputer</option>
+                <option value="Jaringan Komputer">Jaringan Komputer</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <input type="datetime-local" class="add-date" id="paanDeadline" title="Batas Waktu Pengumpulan">
+          </div>
         </form>
+        <input type="file" id="paanFile" hidden multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar">
+        <div class="pending" id="paanPending" hidden></div>
+
+        <div class="course-menu" id="paanCourseMenu" role="tablist" aria-label="Filter mata kuliah Paan"></div>
+
+        <div class="filter-tabs" id="paanFilterTabs">
+          <button type="button" class="filter-btn active" data-filter="active">Aktif</button>
+          <button type="button" class="filter-btn" data-filter="done">Selesai</button>
+        </div>
+
         <div class="clear-all-container">
           <button type="button" class="clear-all-btn" id="paanClearBtn" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             Hapus Semua Tugas
           </button>
         </div>
+
         <div id="paanContainer"></div>
       </section>
 
@@ -608,48 +898,169 @@
         <div class="panel-glow"></div>
         <div class="panel-header">
           <div class="owner-block">
-            <div class="mascot mood-neutral" id="mylaMascot" aria-hidden="true">
-              <svg class="mascot-face" viewBox="0 0 64 64">
-                <circle class="face-bg" cx="32" cy="32" r="30"/>
-                <path class="brow brow-l" id="mylaBrowL" d="M15 20 L27 25"/>
-                <path class="brow brow-r" id="mylaBrowR" d="M49 20 L37 25"/>
-                <ellipse class="eye" cx="23" cy="29" rx="3.2" ry="4.2"/>
-                <ellipse class="eye" cx="41" cy="29" rx="3.2" ry="4.2"/>
-                <ellipse class="cheek" cx="17" cy="38" rx="5" ry="3"/>
-                <ellipse class="cheek" cx="47" cy="38" rx="5" ry="3"/>
-                <path class="mouth" id="mylaMouth" d="M23 40 Q32 40 41 40"/>
-              </svg>
-              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
-              <span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span>
-            </div>
             <div>
               <p class="owner-name">Myla</p>
-              <p class="owner-meta" id="mylaMeta">Menghubungkan...</p>
+              <p class="owner-meta" id="mylaMeta">Menghubungkan…</p>
             </div>
           </div>
-          <div class="count-badge" id="mylaCount">0</div>
         </div>
-        <form class="add-row" id="mylaForm">
-          <input type="text" id="mylaInput" placeholder="Tambah tugas untuk Myla" maxlength="140" autocomplete="off">
-          <button type="submit" class="add-btn">Tambah</button>
+
+        <div class="panel-play-scene">
+          <div class="cat-stage mood-sleeping" id="mylaCatStage" aria-hidden="true">
+            <div class="cat-float" id="mylaCatFloat">
+              <svg class="cat cat--white" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+                <path class="cat__tail" d="M96 96 C 122 100, 132 76, 114 56"/>
+                <ellipse class="cat__body" cx="66" cy="88" rx="29" ry="25"/>
+                <ellipse class="cat__paw" cx="52" cy="110" rx="11" ry="7"/>
+                <ellipse class="cat__paw" cx="80" cy="110" rx="11" ry="7"/>
+                <g class="cat__head">
+                  <path class="cat__ear" d="M45 34 L41 12 L64 26 Z"/>
+                  <path class="cat__ear" d="M87 34 L91 12 L68 26 Z"/>
+                  <circle class="cat__face" cx="66" cy="48" r="26"/>
+                  <g class="cat__eyes cat__eyes--open">
+                    <ellipse class="cat__eye" cx="55" cy="47" rx="3.4" ry="4.6"/>
+                    <ellipse class="cat__eye" cx="77" cy="47" rx="3.4" ry="4.6"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--happy">
+                    <path class="cat__eye-line" d="M49 48 Q55 41 61 48"/>
+                    <path class="cat__eye-line" d="M71 48 Q77 41 83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--sleep">
+                    <path class="cat__eye-line" d="M49 48 L61 48"/>
+                    <path class="cat__eye-line" d="M71 48 L83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--angry">
+                    <path class="cat__eye-line" d="M49 50 L61 45"/>
+                    <path class="cat__eye-line" d="M71 45 L83 50"/>
+                  </g>
+                  <ellipse class="cat__blush" cx="47" cy="57" rx="5" ry="3"/>
+                  <ellipse class="cat__blush" cx="85" cy="57" rx="5" ry="3"/>
+                  <path class="cat__nose" d="M62.4 54.6h7.2l-3.6 3.8z"/>
+                  <path class="cat__mouth" d="M66 58.4v2.6"/>
+                  <path class="cat__mouth" d="M66 61q-3.6 3.4-7 .6"/>
+                  <path class="cat__mouth" d="M66 61q3.6 3.4 7 .6"/>
+                  <g class="cat__whiskers">
+                    <path d="M42 52 L26 48"/><path d="M42 57 L26 60"/>
+                    <path d="M90 52 L106 48"/><path d="M90 57 L106 60"/>
+                  </g>
+                </g>
+              </svg>
+              <svg class="cat cat--black" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+                <path class="cat__tail" d="M96 96 C 122 100, 132 76, 114 56"/>
+                <ellipse class="cat__body" cx="66" cy="88" rx="29" ry="25"/>
+                <ellipse class="cat__paw" cx="52" cy="110" rx="11" ry="7"/>
+                <ellipse class="cat__paw" cx="80" cy="110" rx="11" ry="7"/>
+                <g class="cat__head">
+                  <path class="cat__ear" d="M45 34 L41 12 L64 26 Z"/>
+                  <path class="cat__ear" d="M87 34 L91 12 L68 26 Z"/>
+                  <circle class="cat__face" cx="66" cy="48" r="26"/>
+                  <g class="cat__eyes cat__eyes--open">
+                    <ellipse class="cat__eye" cx="55" cy="47" rx="3.4" ry="4.6"/>
+                    <ellipse class="cat__eye" cx="77" cy="47" rx="3.4" ry="4.6"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--happy">
+                    <path class="cat__eye-line" d="M49 48 Q55 41 61 48"/>
+                    <path class="cat__eye-line" d="M71 48 Q77 41 83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--sleep">
+                    <path class="cat__eye-line" d="M49 48 L61 48"/>
+                    <path class="cat__eye-line" d="M71 48 L83 48"/>
+                  </g>
+                  <g class="cat__eyes cat__eyes--angry">
+                    <path class="cat__eye-line" d="M49 50 L61 45"/>
+                    <path class="cat__eye-line" d="M71 45 L83 50"/>
+                  </g>
+                  <ellipse class="cat__blush" cx="47" cy="57" rx="5" ry="3"/>
+                  <ellipse class="cat__blush" cx="85" cy="57" rx="5" ry="3"/>
+                  <path class="cat__nose" d="M62.4 54.6h7.2l-3.6 3.8z"/>
+                  <path class="cat__mouth" d="M66 58.4v2.6"/>
+                  <path class="cat__mouth" d="M66 61q-3.6 3.4-7 .6"/>
+                  <path class="cat__mouth" d="M66 61q3.6 3.4 7 .6"/>
+                  <g class="cat__whiskers">
+                    <path d="M42 52 L26 48"/><path d="M42 57 L26 60"/>
+                    <path d="M90 52 L106 48"/><path d="M90 57 L106 60"/>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <span class="cat-zzz">z</span>
+          </div>
+
+          <div class="count-ball-scene" id="mylaBallScene">
+            <div class="count-ball-shadow"></div>
+            <div class="count-ball" id="mylaBall">
+              <span id="mylaBallNum">0</span>
+            </div>
+          </div>
+        </div>
+
+        <form class="add-row" id="mylaForm" autocomplete="off">
+          <div class="add-row-main">
+            <div class="add-field">
+              <input type="text" class="add-input" id="mylaInput" placeholder="Tambah tugas untuk Myla" maxlength="140">
+              <button type="button" class="attach-btn" id="mylaAttachBtn" aria-label="Lampirkan gambar atau file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <span class="attach-count" id="mylaAttachCount" hidden>0</span>
+              </button>
+            </div>
+            <button type="submit" class="add-btn">Tambah</button>
+          </div>
+          <div class="add-options">
+            <div class="select-wrapper">
+              <select class="add-select" id="mylaCourse" required>
+                <option value="" disabled selected>Pilih Mata Kuliah...</option>
+                <option value="Statistika">Statistika</option>
+                <option value="Desain UI/UX">Desain UI/UX</option>
+                <option value="Pemrograman Web">Pemrograman Web</option>
+                <option value="Basis Data Lanjut">Basis Data Lanjut</option>
+                <option value="Praktikum Pemrograman Berorientasi Objek">Praktikum Pemrograman Berorientasi Objek</option>
+                <option value="Pemrograman Berorientasi Objek">Pemrograman Berorientasi Objek</option>
+                <option value="Rekayasa Perangkat Lunak">Rekayasa Perangkat Lunak</option>
+                <option value="Praktikum Jaringan Komputer">Praktikum Jaringan Komputer</option>
+                <option value="Jaringan Komputer">Jaringan Komputer</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <input type="datetime-local" class="add-date" id="mylaDeadline" title="Batas Waktu Pengumpulan">
+          </div>
         </form>
+        <input type="file" id="mylaFile" hidden multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar">
+        <div class="pending" id="mylaPending" hidden></div>
+
+        <div class="course-menu" id="mylaCourseMenu" role="tablist" aria-label="Filter mata kuliah Myla"></div>
+
+        <div class="filter-tabs" id="mylaFilterTabs">
+          <button type="button" class="filter-btn active" data-filter="active">Aktif</button>
+          <button type="button" class="filter-btn" data-filter="done">Selesai</button>
+        </div>
+
         <div class="clear-all-container">
           <button type="button" class="clear-all-btn" id="mylaClearBtn" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             Hapus Semua Tugas
           </button>
         </div>
+
         <div id="mylaContainer"></div>
       </section>
 
     </div>
   </main>
-
 </div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Pratinjau gambar">
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Tutup">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
-  // --- KONFIGURASI FIREBASE ---
+  'use strict';
+
   const firebaseConfig = {
     apiKey: "AIzaSyDikwxCVKGAbkwfJtAbjRwKBp1UpKjv35c",
     authDomain: "nugas-myla-dan-paan.firebaseapp.com",
@@ -662,233 +1073,1161 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  let storage = null;
+  try { storage = firebase.storage(); }
+  catch (e) { console.warn('Firebase Storage tidak aktif:', e); }
+
   const OWNERS = ['paan', 'myla'];
-  let state = { paan: [], myla: [] };
-  let currentTab = 'paan';
-  const lastMood = { paan: 'neutral', myla: 'neutral' };
+  const MAX_FILES = 10;
+  const MAX_FILE_SIZE = 25 * 1024 * 1024;
+  const LS_PREFIX = 'nugas_mahasigma_v4_';
+
+  // Batas aman per-doc Firestore: 1 MiB. Base64 = ~1.37x raw. Ambil 500KB base64 biar aman.
+  const ATT_DOC_LIMIT = 500 * 1024;
+  const CHUNK_SIZE = 400 * 1024; // chars per chunk doc
+
+  const state = { paan: [], myla: [] };
+  const activeFilter = { paan: 'active', myla: 'active' };
+  const activeCourse = { paan: 'all', myla: 'all' };
+  const lastMood = { paan: null, myla: null };
+  const pendingFiles = { paan: [], myla: [] };
+  const submitting = { paan: false, myla: false };
+  const prevTabCounts = { paan: null, myla: null };
+  const prevBallCount = { paan: null, myla: null };
+
+  // Cache att data (loaded from attachments collection)
+  const attCache = { paan: {}, myla: {} };     // [owner][attId] = { id, name, type, size, url?, data? }
+  const attLoading = { paan: {}, myla: {} };   // [owner][attId] = true kalau sedang load
 
   const els = {
     paan: {
       form: document.getElementById('paanForm'),
       input: document.getElementById('paanInput'),
+      course: document.getElementById('paanCourse'),
+      deadline: document.getElementById('paanDeadline'),
+      attachBtn: document.getElementById('paanAttachBtn'),
+      attachCount: document.getElementById('paanAttachCount'),
+      fileInput: document.getElementById('paanFile'),
+      pendingBox: document.getElementById('paanPending'),
       container: document.getElementById('paanContainer'),
       clearBtn: document.getElementById('paanClearBtn'),
-      count: document.getElementById('paanCount'),
       meta: document.getElementById('paanMeta'),
-      mascot: document.getElementById('paanMascot'),
-      mouth: document.getElementById('paanMouth'),
-      browL: document.getElementById('paanBrowL'),
-      browR: document.getElementById('paanBrowR'),
-      tabCount: document.getElementById('tabCountPaan')
+      tabCount: document.getElementById('tabCountPaan'),
+      filterTabs: document.getElementById('paanFilterTabs'),
+      courseMenu: document.getElementById('paanCourseMenu'),
+      catStage: document.getElementById('paanCatStage'),
+      catFloat: document.getElementById('paanCatFloat'),
+      ball: document.getElementById('paanBall'),
+      ballNum: document.getElementById('paanBallNum'),
+      ballScene: document.getElementById('paanBallScene')
     },
     myla: {
       form: document.getElementById('mylaForm'),
       input: document.getElementById('mylaInput'),
+      course: document.getElementById('mylaCourse'),
+      deadline: document.getElementById('mylaDeadline'),
+      attachBtn: document.getElementById('mylaAttachBtn'),
+      attachCount: document.getElementById('mylaAttachCount'),
+      fileInput: document.getElementById('mylaFile'),
+      pendingBox: document.getElementById('mylaPending'),
       container: document.getElementById('mylaContainer'),
       clearBtn: document.getElementById('mylaClearBtn'),
-      count: document.getElementById('mylaCount'),
       meta: document.getElementById('mylaMeta'),
-      mascot: document.getElementById('mylaMascot'),
-      mouth: document.getElementById('mylaMouth'),
-      browL: document.getElementById('mylaBrowL'),
-      browR: document.getElementById('mylaBrowR'),
-      tabCount: document.getElementById('tabCountMyla')
+      tabCount: document.getElementById('tabCountMyla'),
+      filterTabs: document.getElementById('mylaFilterTabs'),
+      courseMenu: document.getElementById('mylaCourseMenu'),
+      catStage: document.getElementById('mylaCatStage'),
+      catFloat: document.getElementById('mylaCatFloat'),
+      ball: document.getElementById('mylaBall'),
+      ballNum: document.getElementById('mylaBallNum'),
+      ballScene: document.getElementById('mylaBallScene')
     }
   };
 
-  const emptySVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4" stroke-opacity="0"/><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M8 16h5"/></svg>`;
-  const checkSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-  const trashSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+  const checkSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const trashSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+  const fileSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2z"/></svg>';
+  const imageSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg>';
+  const spinnerSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3a9 9 0 0 1 9 9" opacity=".9"/></svg>';
+  const xSVG     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+  const emptySVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M8 16h5"/></svg>';
 
-  const MOUTHS = {
-    angry: "M22 43 Q32 35 42 43",
-    neutral: "M23 40 Q32 40 41 40",
-    smile: "M21 35 Q32 46 43 35",
-    happy: "M18 32 Q32 50 46 32"
-  };
-  const BROWS = {
-    l: "M14 24 L27 20",
-    r: "M50 24 L37 20"
-  };
+  const $  = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+
+  const tasksCol = (owner) => db.collection('tasks').doc(owner).collection('items');
+  const attsCol = () => db.collection('attachments');
+
+  function escapeHtml(str){
+    return String(str == null ? '' : str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+  function formatBytes(bytes){
+    if (!bytes && bytes !== 0) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+  function isImageType(type, name){
+    if (type && type.indexOf('image/') === 0) return true;
+    if (name && /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(name)) return true;
+    return false;
+  }
+  function withTimeout(promise, ms, label){
+    return Promise.race([
+      promise,
+      new Promise((_, rej) => setTimeout(() => rej(new Error(label + ' timeout')), ms))
+    ]);
+  }
+  function newId(prefix){
+    return (prefix || '') + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+  }
+
+  let toastTimer = null;
+  function showToast(msg, ms){
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), ms || 2600);
+  }
+
+  function formatTimeDiff(ms) {
+    if (ms < 0) ms = Math.abs(ms);
+    const sec = Math.floor(ms / 1000);
+    const min = Math.floor(sec / 60);
+    const hr = Math.floor(min / 60);
+    const day = Math.floor(hr / 24);
+    const month = Math.floor(day / 30);
+    if (month > 0) return `${month} bulan ${day % 30} hari`;
+    if (day > 0) return `${day} hari ${hr % 24} jam`;
+    if (hr > 0) return `${hr} jam ${min % 60} menit`;
+    if (min > 0) return `${min} menit ${sec % 60} detik`;
+    return `${sec} detik`;
+  }
+
+  function triggerCatJump(owner) {
+    const el = els[owner];
+    if (!el || !el.catFloat) return;
+    el.catFloat.classList.remove('jump');
+    void el.catFloat.offsetWidth;
+    el.catFloat.classList.add('jump');
+    setTimeout(() => el.catFloat.classList.remove('jump'), 700);
+  }
+
+  const themeMeta = document.getElementById('themeColorMeta');
+  function applyMode(mode){
+    document.body.setAttribute('data-mode', mode);
+    if (themeMeta) themeMeta.setAttribute('content', mode === 'paanz' ? '#0D0D15' : '#FFE9F1');
+  }
 
   function moodFor(list){
-    const total = list.length;
-    if(total === 0) return 'neutral';
+    if (!list.length) return 'sleeping';
     const done = list.filter(t => t.done).length;
-    const ratio = done / total;
-    if(ratio >= 1) return 'happy';
-    if(ratio >= 0.6) return 'smile';
+    const ratio = done / list.length;
+    if (ratio >= 1) return 'happy';
+    if (ratio >= 0.6) return 'smile';
     return 'angry';
   }
 
-  function updateMascot(owner, mood){
+  function updateCatMood(owner, mood){
     const el = els[owner];
-    el.mascot.classList.remove('mood-neutral', 'mood-angry', 'mood-smile', 'mood-happy');
-    el.mascot.classList.add('mood-' + mood);
-    el.mouth.setAttribute('d', MOUTHS[mood]);
-    if(mood === 'angry'){
-      el.browL.setAttribute('d', BROWS.l);
-      el.browR.setAttribute('d', BROWS.r);
-    }
-    if(mood === 'happy' && lastMood[owner] !== 'happy'){
-      el.mascot.classList.add('celebrate');
-      setTimeout(() => el.mascot.classList.remove('celebrate'), 950);
-    }
+    if (!el || !el.catStage) return;
+    el.catStage.classList.remove('mood-sleeping','mood-angry','mood-neutral','mood-smile','mood-happy');
+    el.catStage.classList.add('mood-' + mood);
+    if (mood === 'happy' && lastMood[owner] !== 'happy') triggerCatJump(owner);
     lastMood[owner] = mood;
+  }
+
+  function updateBall(owner){
+    const el = els[owner];
+    if (!el || !el.ball) return;
+    const list = state[owner] || [];
+    const pending = list.filter(t => !t.done).length;
+    if (el.ballNum) el.ballNum.textContent = pending;
+
+    if (prevBallCount[owner] !== null && prevBallCount[owner] !== pending){
+      el.ball.classList.remove('pop');
+      void el.ball.offsetWidth;
+      el.ball.classList.add('pop');
+      if (el.ballScene){
+        el.ballScene.classList.remove('pop');
+        void el.ballScene.offsetWidth;
+        el.ballScene.classList.add('pop');
+      }
+      setTimeout(() => {
+        el.ball.classList.remove('pop');
+        if (el.ballScene) el.ballScene.classList.remove('pop');
+      }, 800);
+    }
+    prevBallCount[owner] = pending;
+  }
+
+  // ===== ATTACHMENT STORAGE (koleksi `attachments/{id}` + chunk di subcollection) =====
+
+  async function saveAttachmentToFirestore(att){
+    // att: { id, name, type, size, url? , data? }
+    const ref = attsCol().doc(att.id);
+
+    if (att.url) {
+      await ref.set({
+        name: att.name, type: att.type, size: att.size, url: att.url
+      });
+      return;
+    }
+    if (!att.data) return;
+
+    const data = att.data;
+    if (data.length <= ATT_DOC_LIMIT) {
+      await ref.set({
+        name: att.name, type: att.type, size: att.size, data: data
+      });
+      return;
+    }
+
+    // Chunk data besar
+    const chunks = [];
+    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+      chunks.push(data.slice(i, i + CHUNK_SIZE));
+    }
+    await ref.set({
+      name: att.name, type: att.type, size: att.size, chunkCount: chunks.length
+    });
+
+    // Tulis chunk dalam batch (max 400 per batch biar aman)
+    for (let i = 0; i < chunks.length; i += 400) {
+      const batch = db.batch();
+      for (let j = i; j < Math.min(i + 400, chunks.length); j++) {
+        const cid = String(j).padStart(6, '0');
+        batch.set(ref.collection('chunks').doc(cid), { data: chunks[j] });
+      }
+      await batch.commit();
+    }
+  }
+
+  async function loadAttachmentFromFirestore(attId){
+    const ref = attsCol().doc(attId);
+    const meta = await ref.get();
+    if (!meta.exists) return null;
+    const m = meta.data() || {};
+    const att = { id: attId, name: m.name, type: m.type, size: m.size };
+
+    if (m.url) { att.url = m.url; return att; }
+    if (m.data) { att.data = m.data; return att; }
+
+    if (m.chunkCount) {
+      const snap = await ref.collection('chunks').get();
+      const items = [];
+      snap.forEach(c => items.push({ i: c.id, d: (c.data() || {}).data || '' }));
+      items.sort((a,b) => a.i.localeCompare(b.i));
+      att.data = items.map(x => x.d).join('');
+      return att;
+    }
+    return att;
+  }
+
+  async function deleteAttachmentFromFirestore(attId){
+    try {
+      const ref = attsCol().doc(attId);
+      const chunkSnap = await ref.collection('chunks').get();
+      if (!chunkSnap.empty) {
+        const batch = db.batch();
+        chunkSnap.forEach(c => batch.delete(c.ref));
+        batch.delete(ref);
+        await batch.commit();
+      } else {
+        await ref.delete();
+      }
+    } catch (e){ console.warn('Delete attachment fail:', e); }
+  }
+
+  // Prefetch attachment data untuk semua task yang belum ke-cache
+  function prefetchAtts(owner, tasks){
+    for (const t of tasks){
+      const list = t.attachments || [];
+      for (const a of list){
+        if (!a || !a.id) continue;
+        if (attCache[owner][a.id]) continue;
+        if (attLoading[owner][a.id]) continue;
+        attLoading[owner][a.id] = true;
+        loadAttachmentFromFirestore(a.id).then(full => {
+          delete attLoading[owner][a.id];
+          if (full) {
+            attCache[owner][a.id] = full;
+            scheduleRender(owner);
+          }
+        }).catch(err => {
+          delete attLoading[owner][a.id];
+          console.warn('Prefetch att fail:', err);
+        });
+      }
+    }
+  }
+
+  // Render gabungan metadata task + data att (dari cache)
+  function getRenderedAtts(owner, task){
+    const list = task.attachments || [];
+    return list.map(a => {
+      const c = attCache[owner][a.id];
+      if (c) return Object.assign({}, a, c);
+      return Object.assign({}, a, { _notLoaded: true });
+    });
+  }
+
+  const renderTimers = { paan: null, myla: null };
+  function scheduleRender(owner){
+    if (renderTimers[owner]) return;
+    renderTimers[owner] = setTimeout(() => {
+      renderTimers[owner] = null;
+      render(owner);
+    }, 60);
   }
 
   function render(owner){
     const list = state[owner] || [];
     const el = els[owner];
-    const remaining = list.filter(t => !t.done).length;
-    el.count.textContent = remaining;
-    el.tabCount.textContent = remaining;
-    const doneCount = list.filter(t => t.done).length;
-    el.meta.textContent = list.length === 0
-      ? 'Belum ada tugas'
-      : `${list.length} tugas · ${doneCount} selesai`;
+    if (!el) return;
 
-    updateMascot(owner, moodFor(list));
+    const remaining = list.filter(t => !t.done).length;
+    const doneCount = list.filter(t => t.done).length;
+
+    if (el.tabCount) el.tabCount.textContent = remaining;
+    if (prevTabCounts[owner] !== null && prevTabCounts[owner] !== remaining) bumpTabSwitch();
+    prevTabCounts[owner] = remaining;
+
+    if (el.meta) {
+      el.meta.textContent = list.length === 0
+        ? 'Belum ada tugas'
+        : list.length + ' tugas · ' + doneCount + ' selesai';
+    }
+
+    updateCatMood(owner, moodFor(list));
+    updateBall(owner);
 
     const allDone = list.length > 0 && doneCount === list.length;
-    el.clearBtn.disabled = !allDone;
+    if (el.clearBtn) el.clearBtn.disabled = !allDone;
 
-    if(list.length === 0){
-      el.container.innerHTML = `<div class="empty-state">${emptySVG}<p>Belum ada tugas di sini. Tambahkan yang pertama di atas.</p></div>`;
+    renderCourseMenu(owner);
+
+    const filter = activeFilter[owner];
+    let filteredList = list.filter(t => filter === 'active' ? !t.done : t.done);
+    if (activeCourse[owner] !== 'all'){
+      filteredList = filteredList.filter(t => (t.course || 'Lainnya') === activeCourse[owner]);
+    }
+
+    if (filteredList.length === 0){
+      el.container.innerHTML =
+        '<div class="empty-state">' + emptySVG +
+        '<p>' + (filter === 'active'
+          ? (activeCourse[owner] === 'all' ? 'Tidak ada tugas aktif. Santai dulu!' : 'Tidak ada tugas aktif di matkul ini.')
+          : (activeCourse[owner] === 'all' ? 'Belum ada tugas yang selesai.' : 'Belum ada tugas selesai di matkul ini.')) +
+        '</p></div>';
       return;
     }
 
-    const uncompleted = list.filter(t => !t.done).sort((a,b) => a.createdAt - b.createdAt);
-    const completed = list.filter(t => t.done).sort((a,b) => a.createdAt - b.createdAt);
+    const grouped = {};
+    filteredList.forEach(task => {
+      const course = task.course || 'Lainnya';
+      if (!grouped[course]) grouped[course] = [];
+      grouped[course].push(task);
+    });
+    Object.keys(grouped).forEach(course => {
+      grouped[course].sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+    });
+
+    function taskItemHTML(task, done){
+      const atts = getRenderedAtts(owner, task);
+      let attachHTML = '';
+      if (atts.length){
+        attachHTML = '<div class="attach-list">' + atts.map((att, i) => {
+          const isImg = isImageType(att.type, att.name);
+          const haveData = !!(att.url || att.data);
+          const uploading = !!att._uploading;
+          let cls = 'attach-chip';
+          if (uploading) cls += ' uploading';
+
+          let thumb;
+          if (uploading) {
+            thumb = '<span class="attach-icon">' + spinnerSVG + '</span>';
+          } else if (isImg && haveData) {
+            const src = att.url || att.data;
+            thumb = '<img class="attach-thumb" src="' + escapeHtml(src) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">';
+          } else if (isImg) {
+            thumb = '<span class="attach-icon">' + imageSVG + '</span>';
+          } else {
+            thumb = '<span class="attach-icon">' + fileSVG + '</span>';
+          }
+
+          let titleText = att.name || 'Lampiran';
+          if (uploading) titleText = 'Mengunggah… — ' + titleText;
+
+          const nameLabel = escapeHtml(att.name || 'Lampiran');
+
+          return '<button type="button" class="' + cls + '" ' +
+                   (uploading ? 'disabled ' : '') +
+                   'data-attach-id="' + escapeHtml(task.id) + '" ' +
+                   'data-attach-index="' + i + '" ' +
+                   'title="' + escapeHtml(titleText) + '">' +
+                   thumb +
+                   '<span class="attach-name">' + nameLabel + '</span>' +
+                 '</button>';
+        }).join('') + '</div>';
+      }
+
+      let timerHTML = '';
+      if (task.deadline) {
+        if (done) {
+          timerHTML = '<span class="task-timer done-timer">Selesai</span>';
+        } else {
+          const diff = task.deadline - Date.now();
+          if (diff > 0) {
+            timerHTML = '<span class="task-timer on-time" data-deadline="' + task.deadline + '">Sisa: ' + formatTimeDiff(diff) + '</span>';
+          } else {
+            timerHTML = '<span class="task-timer late" data-deadline="' + task.deadline + '">Terlambat: ' + formatTimeDiff(diff) + '</span>';
+          }
+        }
+      }
+
+      return '' +
+        '<li class="task-item' + (done ? ' done' : '') + '" data-id="' + escapeHtml(task.id) + '">' +
+          '<button type="button" class="checkbox' + (done ? ' checked' : '') + '" ' +
+                  'role="checkbox" aria-checked="' + (done ? 'true' : 'false') + '" ' +
+                  'aria-label="' + (done ? 'Tandai belum selesai' : 'Tandai selesai') + '">' +
+            checkSVG +
+          '</button>' +
+          '<div class="task-main">' +
+            '<span class="task-text">' + escapeHtml(task.text) + '</span>' +
+            timerHTML +
+            attachHTML +
+          '</div>' +
+          '<button type="button" class="delete-btn" aria-label="Hapus tugas" title="Hapus tugas">' + trashSVG + '</button>' +
+        '</li>';
+    }
 
     let html = '';
-
-    if(uncompleted.length > 0){
-      html += `<div class="task-section-title">Belum Selesai (${uncompleted.length})</div>`;
-      html += `<ul class="task-list">`;
-      uncompleted.forEach(task => {
-        html += `
-          <li class="task-item" data-id="${task.id}">
-            <div class="checkbox" role="checkbox" tabindex="0" aria-label="Tandai selesai">${checkSVG}</div>
-            <span class="task-text">${escapeHtml(task.text)}</span>
-            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
-          </li>
-        `;
-      });
-      html += `</ul>`;
-    }
-
-    if(completed.length > 0){
-      html += `<div class="task-section-title">Sudah Selesai (${completed.length})</div>`;
-      html += `<ul class="task-list">`;
-      completed.forEach(task => {
-        html += `
-          <li class="task-item done" data-id="${task.id}">
-            <div class="checkbox checked" role="checkbox" tabindex="0" aria-label="Tandai belum selesai">${checkSVG}</div>
-            <span class="task-text">${escapeHtml(task.text)}</span>
-            <button type="button" class="delete-btn" aria-label="Hapus tugas">${trashSVG}</button>
-          </li>
-        `;
-      });
-      html += `</ul>`;
-    }
-
+    Object.keys(grouped).forEach(course => {
+      html += '<div class="course-group">';
+      html += '<h3 class="course-title">' + escapeHtml(course) + '</h3>';
+      html += '<ul class="task-list">';
+      grouped[course].forEach(t => { html += taskItemHTML(t, t.done); });
+      html += '</ul></div>';
+    });
     el.container.innerHTML = html;
 
-    el.container.querySelectorAll('.task-item').forEach(li => {
-      const id = li.dataset.id;
-      li.querySelector('.checkbox').addEventListener('click', () => toggleTask(owner, id));
-      li.querySelector('.checkbox').addEventListener('keydown', (e) => {
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(owner, id); }
-      });
-      li.querySelector('.delete-btn').addEventListener('click', () => removeTask(owner, id));
-    });
-  }
-
-  function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-  }
-
-  // --- REALTIME SYNC DENGAN FIRESTORE ---
-  OWNERS.forEach(owner => {
-    db.collection("tasks").doc(owner).onSnapshot((doc) => {
-      if (doc.exists) {
-        state[owner] = doc.data().items || [];
-      } else {
-        state[owner] = [];
+    $$('.task-item', el.container).forEach(li => {
+      const id = li.getAttribute('data-id');
+      const cb = $('.checkbox', li);
+      if (cb){
+        cb.addEventListener('click', () => toggleTask(owner, id));
+        cb.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(owner, id); }
+        });
       }
-      render(owner);
-    });
-  });
+      const del = $('.delete-btn', li);
+      if (del) del.addEventListener('click', () => removeTask(owner, id));
 
-  async function syncToFirebase(owner){
-    try {
-      await db.collection("tasks").doc(owner).set({ items: state[owner] });
-    } catch(err) {
-      console.error("Firebase sync error:", err);
+      $$('.attach-chip', li).forEach(chip => {
+        if (chip.disabled) return;
+        chip.addEventListener('click', () => {
+          const idx = parseInt(chip.getAttribute('data-attach-index'), 10) || 0;
+          openAttachment(owner, id, idx);
+        });
+      });
+    });
+  }
+
+  function renderCourseMenu(owner){
+    const el = els[owner];
+    const menu = el && el.courseMenu;
+    if (!menu) return;
+
+    const list = state[owner] || [];
+    const filter = activeFilter[owner];
+    const filterList = list.filter(t => filter === 'active' ? !t.done : t.done);
+
+    const counts = {};
+    filterList.forEach(t => {
+      const c = t.course || 'Lainnya';
+      counts[c] = (counts[c] || 0) + 1;
+    });
+
+    if (activeCourse[owner] !== 'all' && !counts[activeCourse[owner]]){
+      activeCourse[owner] = 'all';
+    }
+
+    if (filterList.length === 0){
+      menu.hidden = true;
+      menu.innerHTML = '';
+      return;
+    }
+    menu.hidden = false;
+
+    const courses = Object.keys(counts).sort((a,b) => counts[b] - counts[a]);
+
+    let html = '<button type="button" class="course-chip' +
+      (activeCourse[owner] === 'all' ? ' active' : '') +
+      '" data-course="all" role="tab" aria-selected="' + (activeCourse[owner] === 'all') + '">' +
+      'Semua <span class="course-chip-count">' + filterList.length + '</span></button>';
+
+    courses.forEach(c => {
+      const isActive = activeCourse[owner] === c;
+      html += '<button type="button" class="course-chip' + (isActive ? ' active' : '') +
+        '" data-course="' + escapeHtml(c) + '" role="tab" aria-selected="' + isActive + '">' +
+        escapeHtml(c) + ' <span class="course-chip-count">' + counts[c] + '</span></button>';
+    });
+
+    menu.innerHTML = html;
+
+    $$('.course-chip', menu).forEach(chip => {
+      chip.addEventListener('click', () => {
+        const c = chip.getAttribute('data-course');
+        if (activeCourse[owner] === c) return;
+        activeCourse[owner] = c;
+        render(owner);
+        try { chip.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' }); } catch(e){}
+      });
+    });
+  }
+
+  function updateAllTimers() {
+    const timers = $$('.task-timer[data-deadline]');
+    timers.forEach(timer => {
+      const deadline = parseInt(timer.getAttribute('data-deadline'), 10);
+      const diff = deadline - Date.now();
+      if (diff > 0) {
+        timer.className = 'task-timer on-time';
+        timer.textContent = 'Sisa: ' + formatTimeDiff(diff);
+      } else {
+        timer.className = 'task-timer late';
+        timer.textContent = 'Terlambat: ' + formatTimeDiff(diff);
+      }
+    });
+  }
+  setInterval(updateAllTimers, 1000);
+
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  function openLightbox(url){
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = url;
+    lightboxImg.onerror = function() {
+      showToast('Gagal memuat gambar. Format tidak didukung.');
+      closeLightbox();
+    };
+    lightbox.classList.add('open');
+  }
+  function closeLightbox(){
+    if (!lightbox || !lightboxImg) return;
+    lightbox.classList.remove('open');
+    lightboxImg.src = '';
+  }
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightbox) lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+  async function openAttachment(owner, taskId, index){
+    const task = (state[owner] || []).find(t => t.id === taskId);
+    if (!task){ showToast('Lampiran tidak ditemukan'); return; }
+    const attMeta = (task.attachments || [])[index];
+    if (!attMeta){ showToast('Lampiran tidak ditemukan'); return; }
+
+    let att = attCache[owner][attMeta.id];
+    if (!att || (!att.url && !att.data)) {
+      showToast('Memuat lampiran…', 1200);
+      try {
+        att = await loadAttachmentFromFirestore(attMeta.id);
+        if (att) attCache[owner][attMeta.id] = att;
+      } catch (e){
+        console.warn(e);
+      }
+    }
+    if (!att || (!att.url && !att.data)){
+      showToast('Lampiran tidak bisa dimuat');
+      return;
+    }
+
+    if (isImageType(att.type, att.name)){
+      openLightbox(att.url || att.data);
+    } else {
+      const a = document.createElement('a');
+      a.href = att.url || att.data;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.download = att.name || 'file';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   }
 
-  function addTask(owner, text){
-    const trimmed = text.trim();
-    if(!trimmed) return;
-    state[owner].push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), text: trimmed, done: false, createdAt: Date.now() });
+  function sanitizeFilename(name){
+    return String(name || 'file').replace(/[^\w.\-]+/g, '_').slice(0, 80);
+  }
+
+  async function uploadToStorage(owner, file){
+    if (!storage) throw new Error('Firebase Storage tidak aktif');
+    const path = 'attachments/' + owner + '/' + Date.now() + '_' +
+                 Math.random().toString(36).slice(2,7) + '_' + sanitizeFilename(file.name);
+    const ref = storage.ref(path);
+    await withTimeout(ref.put(file), 45000, 'Upload');
+    const url = await withTimeout(ref.getDownloadURL(), 15000, 'Ambil URL');
+    return { url: url, storage: 'cloud' };
+  }
+
+  function compressImageToDataURL(file, maxDim, quality){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        try { URL.revokeObjectURL(url); } catch (e){}
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+        if (w > maxDim || h > maxDim){
+          const s = maxDim / Math.max(w, h);
+          w = Math.round(w * s);
+          h = Math.round(h * s);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        try { resolve(canvas.toDataURL('image/jpeg', quality)); }
+        catch (e){ reject(new Error('Kompresi gagal: ' + (e.message || e))); }
+      };
+      img.onerror = () => {
+        try { URL.revokeObjectURL(url); } catch (e){}
+        reject(new Error('Gagal memuat gambar'));
+      };
+      img.src = url;
+    });
+  }
+
+  function fileToDataURL(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Gagal membaca file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // PENTING: sekarang selalu mengembalikan att descriptor yang GUARANTEED punya data/url,
+  // dan tidak pernah throw untuk file reasonable.
+  async function buildAttachment(file){
+    const id = newId('att_');
+    const baseMeta = {
+      id: id,
+      name: file.name,
+      type: file.type || 'application/octet-stream',
+      size: file.size || 0
+    };
+
+    // 1) Coba Storage dulu (best case)
+    if (storage) {
+      try {
+        const res = await uploadToStorage('shared', file);
+        return Object.assign(baseMeta, { url: res.url, _kind: 'url' });
+      } catch (err){
+        console.warn('Storage gagal, fallback base64:', err && err.message);
+      }
+    }
+
+    // 2) Fallback: base64 + chunk otomatis kalau perlu
+    const isImg = isImageType(file.type, file.name);
+    if (isImg) {
+      const attempts = [
+        { dim: 1000, q: 0.72 },
+        { dim: 800, q: 0.65 },
+        { dim: 650, q: 0.58 },
+        { dim: 500, q: 0.5 },
+        { dim: 380, q: 0.45 }
+      ];
+      let data = null;
+      for (const a of attempts){
+        try {
+          const d = await compressImageToDataURL(file, a.dim, a.q);
+          // Base64 length kira-kira = bytes. Simpan mentah aja, chunking yang atur.
+          data = d;
+          // Kalau sudah kecil (< 300KB base64), berhenti
+          if (d.length < 300 * 1024) break;
+        } catch (e){ /* coba attempt berikutnya */ }
+      }
+      if (!data) throw new Error('Gambar tidak bisa diproses');
+      return Object.assign(baseMeta, { data: data, _kind: 'data' });
+    }
+
+    // Non-gambar: langsung base64, chunking akan pecah kalau besar
+    const data = await fileToDataURL(file);
+    return Object.assign(baseMeta, { data: data, _kind: 'data' });
+  }
+
+  function updateAttachCount(owner, n){
+    const badge = els[owner].attachCount;
+    if (!badge) return;
+    if (n > 0){ badge.hidden = false; badge.textContent = n; }
+    else { badge.hidden = true; badge.textContent = '0'; }
+  }
+
+  function renderPending(owner){
+    const el = els[owner];
+    const list = pendingFiles[owner];
+    const box = el.pendingBox;
+    if (!box) return;
+
+    if (!list.length){
+      box.hidden = true;
+      box.innerHTML = '';
+      if (el.attachBtn) el.attachBtn.classList.remove('has-file');
+      updateAttachCount(owner, 0);
+      return;
+    }
+
+    box.hidden = false;
+    box.innerHTML = '<div class="pending-list">' + list.map((f, i) => {
+      const isImg = isImageType(f.type, f.name);
+      const thumb = (isImg && f._previewUrl)
+        ? '<img class="pending-thumb" src="' + f._previewUrl + '" alt="">'
+        : '<span class="pending-icon">' + (isImg ? imageSVG : fileSVG) + '</span>';
+      return '<div class="pending-inner" style="animation-delay:' + (i * 45) + 'ms">' +
+        thumb +
+        '<div class="pending-info">' +
+          '<span class="pending-name">' + escapeHtml(f.name) + '</span>' +
+          '<span class="pending-size">' + formatBytes(f.size) + ' · siap diunggah</span>' +
+        '</div>' +
+        '<button type="button" class="pending-remove" data-index="' + i + '" ' +
+                'aria-label="Hapus lampiran ' + escapeHtml(f.name) + '" title="Hapus lampiran">' + xSVG + '</button>' +
+      '</div>';
+    }).join('') + '</div>';
+
+    if (el.attachBtn) el.attachBtn.classList.add('has-file');
+    updateAttachCount(owner, list.length);
+
+    $$('.pending-remove', box).forEach(btn => {
+      btn.addEventListener('click', () => {
+        removePendingAt(owner, parseInt(btn.getAttribute('data-index'), 10));
+      });
+    });
+  }
+
+  function removePendingAt(owner, index){
+    const list = pendingFiles[owner];
+    const f = list[index];
+    if (!f) return;
+    if (f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+    list.splice(index, 1);
+    renderPending(owner);
+  }
+
+  function clearPending(owner){
+    pendingFiles[owner].forEach(f => {
+      if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+    });
+    pendingFiles[owner] = [];
+    if (els[owner].fileInput) els[owner].fileInput.value = '';
+    renderPending(owner);
+  }
+
+  function handleFilesSelected(owner, fileList){
+    const files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+
+    let added = 0;
+    let skippedBig = 0;
+
+    files.forEach(file => {
+      if (pendingFiles[owner].length >= MAX_FILES){
+        showToast('Maksimal ' + MAX_FILES + ' lampiran per tugas');
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE){
+        skippedBig++;
+        return;
+      }
+      const wrapped = {
+        file: file,
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size || 0,
+        _previewUrl: ''
+      };
+      if (isImageType(file.type, file.name)){
+        try { wrapped._previewUrl = URL.createObjectURL(file); } catch (e) {}
+      }
+      pendingFiles[owner].push(wrapped);
+      added++;
+    });
+
+    if (els[owner].fileInput) els[owner].fileInput.value = '';
+
+    if (skippedBig > 0) showToast(skippedBig + ' file dilewati (maks 25 MB / file)');
+    if (added > 0) renderPending(owner);
+  }
+
+  function saveToLocalStorage(owner) {
+    try { localStorage.setItem(LS_PREFIX + owner, JSON.stringify(state[owner])); }
+    catch (e) { console.warn('Gagal menyimpan ke localStorage:', e); }
+  }
+  function loadFromLocalStorage(owner) {
+    try {
+      const saved = localStorage.getItem(LS_PREFIX + owner);
+      if (saved) {
+        state[owner] = JSON.parse(saved) || [];
+        prefetchAtts(owner, state[owner]);
+        render(owner);
+      }
+    } catch (e) { console.warn('Gagal memuat dari localStorage:', e); }
+  }
+
+  async function persistTaskAdd(owner, task){
+    try {
+      // Task doc: hanya metadata + att IDs (bukan data). Data ada di koleksi `attachments`.
+      const attachmentsMeta = (task.attachments || []).map(a => ({
+        id: a.id, name: a.name, type: a.type, size: a.size
+      }));
+      await tasksCol(owner).doc(task.id).set({
+        text: task.text,
+        done: !!task.done,
+        course: task.course,
+        deadline: task.deadline,
+        createdAt: task.createdAt,
+        attachments: attachmentsMeta
+      });
+    } catch (err){
+      console.error('Firebase save task error:', err);
+      showToast('Gagal simpan tugas ke server, data aman di perangkat ini');
+    }
+  }
+
+  async function persistTaskToggle(owner, task){
+    try { await tasksCol(owner).doc(task.id).update({ done: !!task.done }); }
+    catch (err){ console.error('Firebase update error:', err); }
+  }
+  async function persistTaskDelete(owner, id){
+    // Hapus task + atts-nya
+    try {
+      const task = (state[owner] || []).find(t => t.id === id);
+      if (task && Array.isArray(task.attachments)){
+        for (const a of task.attachments){
+          if (a && a.id) deleteAttachmentFromFirestore(a.id);
+        }
+      }
+      await tasksCol(owner).doc(id).delete();
+    } catch (err){ console.error('Firebase delete error:', err); }
+  }
+  async function persistClearAll(owner){
+    try {
+      const snap = await tasksCol(owner).get();
+      // Kumpulkan semua attachment IDs dulu untuk dihapus
+      snap.forEach(doc => {
+        const d = doc.data() || {};
+        if (Array.isArray(d.attachments)){
+          d.attachments.forEach(a => {
+            if (a && a.id) deleteAttachmentFromFirestore(a.id);
+          });
+        }
+      });
+      const batch = db.batch();
+      snap.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    } catch (err){ console.error('Firebase clear error:', err); }
+  }
+
+  // Migration dari struktur LAMA (attachments inline di task doc)
+  async function migrateFromOldFormat(owner){
+    try {
+      const oldRef = db.collection('tasks').doc(owner);
+      const oldDoc = await oldRef.get();
+      if (!oldDoc.exists) return;
+      const data = oldDoc.data() || {};
+      if (!Array.isArray(data.items) || !data.items.length) return;
+
+      const existing = await tasksCol(owner).limit(1).get();
+      if (!existing.empty) return;
+
+      const batch = db.batch();
+      for (const task of data.items){
+        if (!task || typeof task !== 'object') continue;
+        if (!task.id) task.id = newId('t_');
+        const attsMeta = [];
+        if (Array.isArray(task.attachments)){
+          for (const a of task.attachments){
+            if (!a) continue;
+            const attId = a.id || newId('att_');
+            let url = a.url; let dataB64;
+            if (url && url.startsWith('data:')) { dataB64 = url; url = null; }
+            const attObj = { id: attId, name: a.name, type: a.type, size: a.size };
+            if (url) attObj.url = url;
+            else if (dataB64) attObj.data = dataB64;
+            try { await saveAttachmentToFirestore(attObj); } catch(e){ console.warn('Migrate att fail', e); }
+            attsMeta.push({ id: attId, name: a.name, type: a.type, size: a.size });
+          }
+        }
+        batch.set(tasksCol(owner).doc(task.id), {
+          text: task.text || '',
+          done: !!task.done,
+          course: task.course || 'Lainnya',
+          deadline: task.deadline || null,
+          createdAt: task.createdAt || Date.now(),
+          attachments: attsMeta
+        });
+      }
+      batch.update(oldRef, { items: [] });
+      await batch.commit();
+      console.log('Migrated ' + data.items.length + ' tasks for ' + owner);
+    } catch (e){
+      console.warn('Migration failed:', e);
+    }
+  }
+
+  async function setupOwner(owner){
+    loadFromLocalStorage(owner);
+    await migrateFromOldFormat(owner);
+
+    tasksCol(owner).onSnapshot((snap) => {
+      const tasks = [];
+      snap.forEach(doc => {
+        const d = doc.data() || {};
+        tasks.push({
+          id: doc.id,
+          text: d.text || '',
+          done: !!d.done,
+          course: d.course || 'Lainnya',
+          deadline: d.deadline || null,
+          createdAt: d.createdAt || Date.now(),
+          attachments: Array.isArray(d.attachments) ? d.attachments : []
+        });
+      });
+      tasks.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+      state[owner] = tasks;
+      saveToLocalStorage(owner);
+      prefetchAtts(owner, tasks);
+      render(owner);
+    }, (err) => {
+      console.error('Firestore listen error:', err);
+      if (els[owner].meta) els[owner].meta.textContent = 'Offline (Tersimpan Lokal)';
+    });
+  }
+
+  OWNERS.forEach(setupOwner);
+
+  async function addTask(owner, text){
+    if (submitting[owner]) return;
+    const trimmed = (text || '').trim();
+    const queue = pendingFiles[owner].slice();
+    const course = els[owner].course.value;
+    const deadlineVal = els[owner].deadline.value;
+
+    if (!trimmed && !queue.length){
+      showToast('Tulis tugas dulu ya');
+      els[owner].input.focus();
+      return;
+    }
+    if (!course) {
+      showToast('Pilih mata kuliah dulu ya');
+      els[owner].course.focus();
+      return;
+    }
+
+    submitting[owner] = true;
+    const el = els[owner];
+    const addBtn = $('.add-btn', el.form);
+    const originalText = addBtn ? addBtn.textContent : 'Tambah';
+
+    const taskId = newId('t_');
+
+    // Placeholder chip untuk setiap file
+    const placeholderAtts = queue.map(w => ({
+      id: newId('att_'),
+      name: w.name,
+      type: w.type,
+      size: w.size,
+      _uploading: true
+    }));
+
+    const optimisticTask = {
+      id: taskId,
+      text: trimmed || (queue.length ? queue[0].name : '(tanpa judul)'),
+      done: false,
+      course: course,
+      deadline: deadlineVal ? new Date(deadlineVal).getTime() : null,
+      createdAt: Date.now(),
+      attachments: placeholderAtts
+    };
+    state[owner].push(optimisticTask);
+    clearPending(owner);
     render(owner);
-    syncToFirebase(owner);
+    triggerCatJump(owner);
+
+    el.input.value = '';
+    el.course.value = '';
+    el.deadline.value = '';
+    el.input.focus();
+
+    if (addBtn){ addBtn.disabled = true; addBtn.textContent = '…'; }
+
+    // Proses semua file PARALEL
+    let finalAtts = [];
+    if (queue.length){
+      const results = await Promise.all(queue.map(async (w, i) => {
+        const placeholder = placeholderAtts[i];
+        try {
+          const att = await buildAttachment(w.file);
+          // Pakai id dari placeholder supaya konsisten di UI
+          att.id = placeholder.id;
+
+          // Simpan attachment ke Firestore (collection terpisah — chunk otomatis kalau besar)
+          await saveAttachmentToFirestore(att);
+
+          // Prefetch ke cache supaya thumbnail langsung muncul
+          attCache[owner][att.id] = {
+            id: att.id, name: att.name, type: att.type, size: att.size,
+            url: att.url, data: att.data
+          };
+
+          return att;
+        } catch (err){
+          console.error('Attachment gagal:', w.name, err);
+          return {
+            id: placeholder.id,
+            name: w.name, type: w.type, size: w.size,
+            _failed: true, _error: (err && err.message) || 'Upload gagal'
+          };
+        }
+      }));
+      finalAtts = results;
+    }
+
+    // Update task dengan attachments yang sudah diproses
+    const idx = state[owner].findIndex(t => t.id === taskId);
+    if (idx >= 0) {
+      state[owner][idx].attachments = finalAtts.map(a => ({
+        id: a.id, name: a.name, type: a.type, size: a.size, _failed: a._failed, _error: a._error
+      }));
+    }
+    render(owner);
+
+    // Simpan task doc (metadata atts)
+    persistTaskAdd(owner, state[owner][idx]).then(() => {
+      submitting[owner] = false;
+      if (addBtn){ addBtn.disabled = false; addBtn.textContent = originalText; }
+    });
   }
 
   function toggleTask(owner, id){
-    const task = state[owner].find(t => t.id === id);
-    if(!task) return;
+    const task = (state[owner] || []).find(t => t.id === id);
+    if (!task) return;
     task.done = !task.done;
     render(owner);
-    syncToFirebase(owner);
+    if (task.done) triggerCatJump(owner);
+    persistTaskToggle(owner, task);
   }
 
   function removeTask(owner, id){
-    state[owner] = state[owner].filter(t => t.id !== id);
+    state[owner] = (state[owner] || []).filter(t => t.id !== id);
     render(owner);
-    syncToFirebase(owner);
+    persistTaskDelete(owner, id);
   }
 
   function clearAllTasks(owner){
-    const items = els[owner].container.querySelectorAll('.task-item');
+    const container = els[owner].container;
+    const items = $$('.task-item', container);
     items.forEach(item => item.classList.add('clearing'));
     setTimeout(() => {
       state[owner] = [];
+      activeCourse[owner] = 'all';
       render(owner);
-      syncToFirebase(owner);
+      persistClearAll(owner);
     }, 380);
   }
 
   OWNERS.forEach(owner => {
-    els[owner].form.addEventListener('submit', (e) => {
+    const el = els[owner];
+
+    el.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      addTask(owner, els[owner].input.value);
-      els[owner].input.value = '';
-      els[owner].input.focus();
+      addTask(owner, el.input.value);
     });
-    els[owner].clearBtn.addEventListener('click', () => {
-      clearAllTasks(owner);
+
+    el.attachBtn.addEventListener('click', () => {
+      el.fileInput.click();
+    });
+
+    el.fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files && files.length) handleFilesSelected(owner, files);
+    });
+
+    el.clearBtn.addEventListener('click', () => clearAllTasks(owner));
+
+    el.filterTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      const filter = btn.getAttribute('data-filter');
+      if (activeFilter[owner] === filter) return;
+      activeFilter[owner] = filter;
+      activeCourse[owner] = 'all';
+      $$('.filter-btn', el.filterTabs).forEach(b => b.classList.toggle('active', b === btn));
+      render(owner);
     });
   });
 
+  /* TAB SWITCH */
   const tabSwitch = document.getElementById('tabSwitch');
   const board = document.getElementById('board');
-  const tabButtons = tabSwitch.querySelectorAll('.tab-btn');
+  const tabButtons = $$('.tab-btn', tabSwitch);
+  const tabThumb = $('.tab-thumb', tabSwitch);
+  let bumpTimer = null;
 
-  function setActiveTab(tab){
-    currentTab = tab;
-    tabSwitch.dataset.active = tab;
-    board.dataset.active = tab;
-    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+  function updateThumb(){
+    const active = $('.tab-btn.active', tabSwitch);
+    if (!active || !tabThumb) return;
+    const cs = getComputedStyle(tabSwitch);
+    const padL = parseFloat(cs.paddingLeft) || 5;
+    const sw = tabSwitch.getBoundingClientRect();
+    const r = active.getBoundingClientRect();
+    tabThumb.style.width = r.width + 'px';
+    tabThumb.style.transform = 'translateX(' + (r.left - sw.left - padL) + 'px)';
   }
-
+  function bumpTabSwitch(){
+    if (!tabSwitch) return;
+    tabSwitch.classList.remove('bump');
+    void tabSwitch.offsetWidth;
+    tabSwitch.classList.add('bump');
+    if (bumpTimer) clearTimeout(bumpTimer);
+    bumpTimer = setTimeout(() => {
+      tabSwitch.classList.remove('bump');
+      updateThumb();
+    }, 700);
+  }
+  function setActiveTab(tab){
+    tabSwitch.setAttribute('data-active', tab);
+    board.setAttribute('data-active', tab);
+    tabButtons.forEach(btn => {
+      const isActive = btn.getAttribute('data-tab') === tab;
+      btn.classList.toggle('active', isActive);
+    });
+    applyMode(tab === 'paan' ? 'paanz' : 'myla');
+    updateThumb();
+  }
   tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+    btn.addEventListener('click', () => setActiveTab(btn.getAttribute('data-tab')));
   });
+  window.addEventListener('resize', () => setTimeout(updateThumb, 60));
+  window.addEventListener('load', () => setTimeout(updateThumb, 80));
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(() => setTimeout(updateThumb, 40));
+  }
+  setActiveTab('paan');
+  setTimeout(updateThumb, 120);
 
-  // Motivator rotation
+  /* MOTIVATION */
   const motivationLines = [
     'Real-time sync otomatis antar perangkat via Firebase Firestore.',
     'Skripsi tidak akan selesai sendiri, tapi satu tugas selesai hari ini sudah kemajuan.',
@@ -901,11 +2240,10 @@
     'Kuliah sambil begadang boleh sesekali, tapi jangan lupa istirahat juga bagian dari produktif.',
     'Satu tugas selesai lebih baik daripada sepuluh rencana yang tidak dimulai.'
   ];
-
   let motivationIndex = 0;
   const motivationEl = document.getElementById('motivationText');
-
   function rotateMotivation(){
+    if (!motivationEl) return;
     motivationEl.classList.add('fading');
     setTimeout(() => {
       motivationIndex = (motivationIndex + 1) % motivationLines.length;
@@ -913,8 +2251,16 @@
       motivationEl.classList.remove('fading');
     }, 550);
   }
-
   setInterval(rotateMotivation, 5200);
+
+  window.addEventListener('beforeunload', () => {
+    OWNERS.forEach(owner => {
+      pendingFiles[owner].forEach(f => {
+        if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+      });
+    });
+  });
+
 })();
 </script>
 
