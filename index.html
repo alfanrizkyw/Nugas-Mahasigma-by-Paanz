@@ -641,7 +641,9 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 .attach-chip.uploading .attach-icon svg{animation:attach-spin .9s linear infinite;}
 @keyframes attach-spin { to { transform: rotate(360deg); } }
 
-.delete-btn{
+.task-actions{display:flex; flex-direction:column; gap:6px; flex-shrink:0;}
+
+.delete-btn,.edit-btn{
   flex-shrink:0; width:38px; height:38px;
   border:1px solid var(--line); background:var(--card-hover);
   color:var(--ink-soft); border-radius:12px; cursor:pointer;
@@ -649,9 +651,10 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   transition:background .18s ease, color .18s ease, border-color .18s ease, transform .15s ease;
   -webkit-tap-highlight-color:transparent;
 }
-.delete-btn svg{width:18px; height:18px;}
+.delete-btn svg,.edit-btn svg{width:18px; height:18px;}
 .delete-btn:hover{background:var(--accent); border-color:var(--accent); color:var(--on-accent); transform:translateY(-1px);}
-.delete-btn:active{transform:scale(.93);}
+.edit-btn:hover{background:var(--accent); border-color:var(--accent); color:var(--on-accent); transform:translateY(-1px);}
+.delete-btn:active,.edit-btn:active{transform:scale(.93);}
 
 .empty-state{
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -683,6 +686,129 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 }
 .lightbox-close:hover{background:rgba(255,255,255,.28);}
 .lightbox-close svg{width:19px; height:19px;}
+
+/* ================= EDIT MODAL ================= */
+.modal{
+  position:fixed; inset:0; z-index:70;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(10px,3.5vw,24px);
+  background:rgba(8,7,12,.72);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  opacity:0; pointer-events:none;
+  transition:opacity .3s var(--ease);
+  overflow-y:auto;
+}
+.modal.open{opacity:1; pointer-events:auto;}
+.modal-card{
+  width:100%; max-width:540px;
+  max-height:calc(100vh - 32px);
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  border-radius:var(--radius-lg);
+  border:1px solid var(--panel-border);
+  padding:clamp(16px,4.5vw,24px);
+  transform:translateY(16px) scale(.98);
+  transition:transform .34s var(--ease);
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.65);
+}
+.modal.open .modal-card{transform:translateY(0) scale(1);}
+body[data-mode="myla"] .modal-card{
+  background:linear-gradient(150deg,#FFF7FA 0%,#FFE9F1 55%,#FFDCEB 100%);
+}
+body[data-mode="paanz"] .modal-card{
+  background:linear-gradient(150deg,#1B1B26 0%,#111119 55%,#1F1F2E 100%);
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px;}
+.modal-title{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1.1rem,4vw,1.3rem); margin:0; color:var(--ink); letter-spacing:-.01em;
+}
+.modal-close{
+  flex-shrink:0; width:38px; height:38px; border-radius:12px;
+  border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.modal-close svg{width:17px; height:17px;}
+.modal-close:hover{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+.modal-close:active{transform:scale(.93);}
+
+.edit-field{display:flex; flex-direction:column; gap:7px; margin-bottom:14px; min-width:0;}
+.edit-label{
+  font-size:.72rem; font-weight:800; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--ink-soft);
+}
+.edit-input{
+  width:100%; padding:12px 14px; font-family:inherit; font-size:.92rem;
+  border-radius:var(--radius-sm); border:1.5px solid var(--line);
+  background:var(--card); color:var(--ink); outline:none;
+  transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.edit-input::placeholder{color:var(--ink-faint);}
+.edit-input:focus{border-color:var(--accent); background:var(--card-hover); box-shadow:0 0 0 4px var(--focus-ring);}
+.edit-grid{display:flex; gap:10px; flex-wrap:wrap;}
+.edit-grid .edit-field{flex:1 1 180px;}
+
+.edit-att-list{display:flex; flex-direction:column; gap:6px; margin-bottom:8px;}
+.edit-att-item{
+  display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius-sm); padding:7px 8px;
+  animation:pending-in .28s var(--ease) both;
+}
+.edit-att-thumb{width:38px; height:38px; border-radius:9px; object-fit:cover; flex-shrink:0; background:var(--card-hover);}
+.edit-att-icon{
+  width:38px; height:38px; border-radius:9px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card-hover); color:var(--accent);
+}
+.edit-att-icon svg{width:18px; height:18px;}
+.edit-att-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;}
+.edit-att-name{font-size:.83rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--ink);}
+.edit-att-size{font-size:.72rem; color:var(--ink-soft);}
+.edit-att-remove{
+  flex-shrink:0; width:32px; height:32px; border-radius:9px;
+  border:1px solid var(--line); background:var(--card-hover); color:var(--ink-soft);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.edit-att-remove svg{width:15px; height:15px;}
+.edit-att-remove:hover{background:#FF4D6A; border-color:#FF4D6A; color:#fff;}
+.edit-att-remove:active{transform:scale(.93);}
+.edit-att-empty{font-size:.8rem; color:var(--ink-faint); margin:0 0 6px; font-style:italic;}
+.edit-add-file{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:9px 14px; border-radius:var(--radius-sm);
+  border:1.5px dashed var(--line); background:transparent;
+  color:var(--ink-soft); font-weight:700; font-size:.8rem; cursor:pointer;
+  transition:border-color .2s ease, color .2s ease, background .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  align-self:flex-start;
+}
+.edit-add-file svg{width:15px; height:15px;}
+.edit-add-file:hover{border-color:var(--accent); color:var(--accent); background:var(--card);}
+.edit-add-file:active{transform:scale(.97);}
+
+.modal-foot{display:flex; gap:10px; justify-content:flex-end; margin-top:4px;}
+.modal-btn{
+  border:none; font-family:inherit; font-weight:700; font-size:.88rem;
+  padding:12px 20px; border-radius:var(--radius-sm); cursor:pointer;
+  transition:transform .15s ease, filter .15s ease, background .2s ease, color .2s ease, opacity .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.modal-btn.ghost{background:var(--card); color:var(--ink-soft); border:1px solid var(--line);}
+.modal-btn.ghost:hover{color:var(--ink); background:var(--card-hover);}
+.modal-btn.primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  color:var(--on-accent);
+  box-shadow:0 10px 22px -10px var(--accent-deep);
+}
+.modal-btn.primary:hover{transform:translateY(-1px); filter:brightness(1.06);}
+.modal-btn:active{transform:scale(.97);}
+.modal-btn:disabled{opacity:.6; cursor:not-allowed; transform:none;}
+
 .toast{
   position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
   transform:translate(-50%,16px); z-index:80;
@@ -703,6 +829,8 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   .select-wrapper, .add-date { width: 100%; }
   .tab-dot{display:none;}
   .attach-name{max-width:16ch;}
+  .modal-foot{flex-direction:column-reverse;}
+  .modal-btn{width:100%;}
 }
 @media (max-width:400px){
   .tab-switch{--tab-pad:4px;}
@@ -711,7 +839,7 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   .count-ball-scene{width:42px; height:52px;}
   .count-ball{width:40px; height:40px; font-size:1rem;}
   .task-item{gap:9px; padding:10px;}
-  .delete-btn{width:36px; height:36px;}
+  .delete-btn,.edit-btn{width:36px; height:36px;}
   .course-chip{padding:7px 11px; font-size:.74rem;}
 }
 @media (min-width:900px){ .page{max-width:800px;} }
@@ -1055,6 +1183,51 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   <img id="lightboxImg" src="" alt="">
 </div>
 
+<!-- ====== MODAL EDIT TUGAS ====== -->
+<div class="modal" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+  <div class="modal-card" id="editCard">
+    <div class="modal-head">
+      <h2 class="modal-title" id="editModalTitle">Edit Tugas</h2>
+      <button type="button" class="modal-close" id="editClose" aria-label="Tutup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="edit-field">
+      <label class="edit-label" for="editText">Nama Tugas</label>
+      <input type="text" class="edit-input" id="editText" maxlength="140" placeholder="Nama tugas">
+    </div>
+
+    <div class="edit-grid">
+      <div class="edit-field">
+        <label class="edit-label" for="editCourse">Mata Kuliah</label>
+        <div class="select-wrapper">
+          <select class="add-select" id="editCourse"></select>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label" for="editDeadline">Batas Waktu</label>
+        <input type="datetime-local" class="add-date" id="editDeadline">
+      </div>
+    </div>
+
+    <div class="edit-field">
+      <label class="edit-label">Lampiran</label>
+      <div class="edit-att-list" id="editAttList"></div>
+      <button type="button" class="edit-add-file" id="editAddFileBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        Tambah File
+      </button>
+      <input type="file" id="editFileInput" hidden multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar">
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" class="modal-btn ghost" id="editCancelBtn">Batal</button>
+      <button type="button" class="modal-btn primary" id="editSaveBtn">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1146,6 +1319,7 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 
   const checkSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const trashSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+  const editSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const fileSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2z"/></svg>';
   const imageSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg>';
   const spinnerSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3a9 9 0 0 1 9 9" opacity=".9"/></svg>';
@@ -1182,6 +1356,18 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   }
   function newId(prefix){
     return (prefix || '') + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+  }
+  function toDatetimeLocal(ms){
+    const d = new Date(ms);
+    if (!ms || isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+           'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function cleanAttMeta(a){
+    const o = { id: a.id, name: a.name, type: a.type, size: a.size };
+    if (a._failed) { o._failed = true; o._error = a._error || 'Upload gagal'; }
+    return o;
   }
 
   let toastTimer = null;
@@ -1268,7 +1454,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   // ===== ATTACHMENT STORAGE (koleksi `attachments/{id}` + chunk di subcollection) =====
 
   async function saveAttachmentToFirestore(att){
-    // att: { id, name, type, size, url? , data? }
     const ref = attsCol().doc(att.id);
 
     if (att.url) {
@@ -1287,7 +1472,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       return;
     }
 
-    // Chunk data besar
     const chunks = [];
     for (let i = 0; i < data.length; i += CHUNK_SIZE) {
       chunks.push(data.slice(i, i + CHUNK_SIZE));
@@ -1296,7 +1480,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       name: att.name, type: att.type, size: att.size, chunkCount: chunks.length
     });
 
-    // Tulis chunk dalam batch (max 400 per batch biar aman)
     for (let i = 0; i < chunks.length; i += 400) {
       const batch = db.batch();
       for (let j = i; j < Math.min(i + 400, chunks.length); j++) {
@@ -1343,7 +1526,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
     } catch (e){ console.warn('Delete attachment fail:', e); }
   }
 
-  // Prefetch attachment data untuk semua task yang belum ke-cache
   function prefetchAtts(owner, tasks){
     for (const t of tasks){
       const list = t.attachments || [];
@@ -1366,7 +1548,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
     }
   }
 
-  // Render gabungan metadata task + data att (dari cache)
   function getRenderedAtts(owner, task){
     const list = task.attachments || [];
     return list.map(a => {
@@ -1502,7 +1683,10 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
             timerHTML +
             attachHTML +
           '</div>' +
-          '<button type="button" class="delete-btn" aria-label="Hapus tugas" title="Hapus tugas">' + trashSVG + '</button>' +
+          '<div class="task-actions">' +
+            '<button type="button" class="edit-btn" aria-label="Edit tugas" title="Edit tugas">' + editSVG + '</button>' +
+            '<button type="button" class="delete-btn" aria-label="Hapus tugas" title="Hapus tugas">' + trashSVG + '</button>' +
+          '</div>' +
         '</li>';
     }
 
@@ -1527,6 +1711,9 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       }
       const del = $('.delete-btn', li);
       if (del) del.addEventListener('click', () => removeTask(owner, id));
+
+      const editBtn = $('.edit-btn', li);
+      if (editBtn) editBtn.addEventListener('click', () => openEditModal(owner, id));
 
       $$('.attach-chip', li).forEach(chip => {
         if (chip.disabled) return;
@@ -1627,7 +1814,12 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   }
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
   if (lightbox) lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (editEls.modal && editEls.modal.classList.contains('open')) { closeEditModal(); return; }
+    closeLightbox();
+  });
 
   async function openAttachment(owner, taskId, index){
     const task = (state[owner] || []).find(t => t.id === taskId);
@@ -1718,8 +1910,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
     });
   }
 
-  // PENTING: sekarang selalu mengembalikan att descriptor yang GUARANTEED punya data/url,
-  // dan tidak pernah throw untuk file reasonable.
   async function buildAttachment(file){
     const id = newId('att_');
     const baseMeta = {
@@ -1729,7 +1919,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       size: file.size || 0
     };
 
-    // 1) Coba Storage dulu (best case)
     if (storage) {
       try {
         const res = await uploadToStorage('shared', file);
@@ -1739,7 +1928,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       }
     }
 
-    // 2) Fallback: base64 + chunk otomatis kalau perlu
     const isImg = isImageType(file.type, file.name);
     if (isImg) {
       const attempts = [
@@ -1753,9 +1941,7 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       for (const a of attempts){
         try {
           const d = await compressImageToDataURL(file, a.dim, a.q);
-          // Base64 length kira-kira = bytes. Simpan mentah aja, chunking yang atur.
           data = d;
-          // Kalau sudah kecil (< 300KB base64), berhenti
           if (d.length < 300 * 1024) break;
         } catch (e){ /* coba attempt berikutnya */ }
       }
@@ -1763,7 +1949,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       return Object.assign(baseMeta, { data: data, _kind: 'data' });
     }
 
-    // Non-gambar: langsung base64, chunking akan pecah kalau besar
     const data = await fileToDataURL(file);
     return Object.assign(baseMeta, { data: data, _kind: 'data' });
   }
@@ -1887,10 +2072,7 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 
   async function persistTaskAdd(owner, task){
     try {
-      // Task doc: hanya metadata + att IDs (bukan data). Data ada di koleksi `attachments`.
-      const attachmentsMeta = (task.attachments || []).map(a => ({
-        id: a.id, name: a.name, type: a.type, size: a.size
-      }));
+      const attachmentsMeta = (task.attachments || []).map(cleanAttMeta);
       await tasksCol(owner).doc(task.id).set({
         text: task.text,
         done: !!task.done,
@@ -1910,7 +2092,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
     catch (err){ console.error('Firebase update error:', err); }
   }
   async function persistTaskDelete(owner, id){
-    // Hapus task + atts-nya
     try {
       const task = (state[owner] || []).find(t => t.id === id);
       if (task && Array.isArray(task.attachments)){
@@ -1924,7 +2105,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
   async function persistClearAll(owner){
     try {
       const snap = await tasksCol(owner).get();
-      // Kumpulkan semua attachment IDs dulu untuk dihapus
       snap.forEach(doc => {
         const d = doc.data() || {};
         if (Array.isArray(d.attachments)){
@@ -1939,7 +2119,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
     } catch (err){ console.error('Firebase clear error:', err); }
   }
 
-  // Migration dari struktur LAMA (attachments inline di task doc)
   async function migrateFromOldFormat(owner){
     try {
       const oldRef = db.collection('tasks').doc(owner);
@@ -2042,7 +2221,6 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 
     const taskId = newId('t_');
 
-    // Placeholder chip untuk setiap file
     const placeholderAtts = queue.map(w => ({
       id: newId('att_'),
       name: w.name,
@@ -2072,20 +2250,15 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
 
     if (addBtn){ addBtn.disabled = true; addBtn.textContent = '…'; }
 
-    // Proses semua file PARALEL
     let finalAtts = [];
     if (queue.length){
       const results = await Promise.all(queue.map(async (w, i) => {
         const placeholder = placeholderAtts[i];
         try {
           const att = await buildAttachment(w.file);
-          // Pakai id dari placeholder supaya konsisten di UI
           att.id = placeholder.id;
-
-          // Simpan attachment ke Firestore (collection terpisah — chunk otomatis kalau besar)
           await saveAttachmentToFirestore(att);
 
-          // Prefetch ke cache supaya thumbnail langsung muncul
           attCache[owner][att.id] = {
             id: att.id, name: att.name, type: att.type, size: att.size,
             url: att.url, data: att.data
@@ -2104,16 +2277,12 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       finalAtts = results;
     }
 
-    // Update task dengan attachments yang sudah diproses
     const idx = state[owner].findIndex(t => t.id === taskId);
     if (idx >= 0) {
-      state[owner][idx].attachments = finalAtts.map(a => ({
-        id: a.id, name: a.name, type: a.type, size: a.size, _failed: a._failed, _error: a._error
-      }));
+      state[owner][idx].attachments = finalAtts.map(cleanAttMeta);
     }
     render(owner);
 
-    // Simpan task doc (metadata atts)
     persistTaskAdd(owner, state[owner][idx]).then(() => {
       submitting[owner] = false;
       if (addBtn){ addBtn.disabled = false; addBtn.textContent = originalText; }
@@ -2177,6 +2346,302 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       render(owner);
     });
   });
+
+  /* =================== EDIT MODAL LOGIC =================== */
+
+  const editEls = {
+    modal: document.getElementById('editModal'),
+    card: document.getElementById('editCard'),
+    closeBtn: document.getElementById('editClose'),
+    cancelBtn: document.getElementById('editCancelBtn'),
+    saveBtn: document.getElementById('editSaveBtn'),
+    text: document.getElementById('editText'),
+    course: document.getElementById('editCourse'),
+    deadline: document.getElementById('editDeadline'),
+    attList: document.getElementById('editAttList'),
+    addFileBtn: document.getElementById('editAddFileBtn'),
+    fileInput: document.getElementById('editFileInput')
+  };
+
+  const editState = {
+    owner: null,
+    taskId: null,
+    existing: [],   // { id, name, type, size, removed }
+    added: [],      // { file, name, type, size, _previewUrl }
+    saving: false
+  };
+
+  function buildCourseOptions(owner, selected){
+    const src = els[owner].course;
+    const opts = [];
+    Array.from(src.options).forEach(o => {
+      if (o.disabled || !o.value) return;
+      if (opts.indexOf(o.value) === -1) opts.push(o.value);
+    });
+    if (selected && opts.indexOf(selected) === -1) opts.push(selected);
+    if (!selected && opts.length) selected = opts[0];
+
+    editEls.course.innerHTML = opts.map(v =>
+      '<option value="' + escapeHtml(v) + '"' + (v === selected ? ' selected' : '') + '>' +
+      escapeHtml(v) + '</option>'
+    ).join('');
+  }
+
+  function renderEditAtts(){
+    const box = editEls.attList;
+    const owner = editState.owner;
+    let html = '';
+
+    editState.existing.forEach((a, i) => {
+      if (a.removed) return;
+      const cached = attCache[owner] && attCache[owner][a.id];
+      const isImg = isImageType(a.type, a.name);
+      const src = cached && (cached.url || cached.data);
+      let thumb;
+      if (isImg && src) thumb = '<img class="edit-att-thumb" src="' + escapeHtml(src) + '" alt="">';
+      else thumb = '<span class="edit-att-icon">' + (isImg ? imageSVG : fileSVG) + '</span>';
+
+      html += '<div class="edit-att-item">' + thumb +
+        '<div class="edit-att-info">' +
+          '<span class="edit-att-name">' + escapeHtml(a.name || 'Lampiran') + '</span>' +
+          '<span class="edit-att-size">' + formatBytes(a.size) + '</span>' +
+        '</div>' +
+        '<button type="button" class="edit-att-remove" data-kind="existing" data-index="' + i + '" aria-label="Hapus lampiran" title="Hapus lampiran">' + xSVG + '</button>' +
+      '</div>';
+    });
+
+    editState.added.forEach((f, i) => {
+      const isImg = isImageType(f.type, f.name);
+      const thumb = (isImg && f._previewUrl)
+        ? '<img class="edit-att-thumb" src="' + f._previewUrl + '" alt="">'
+        : '<span class="edit-att-icon">' + (isImg ? imageSVG : fileSVG) + '</span>';
+
+      html += '<div class="edit-att-item">' + thumb +
+        '<div class="edit-att-info">' +
+          '<span class="edit-att-name">' + escapeHtml(f.name) + '</span>' +
+          '<span class="edit-att-size">' + formatBytes(f.size) + ' · baru</span>' +
+        '</div>' +
+        '<button type="button" class="edit-att-remove" data-kind="new" data-index="' + i + '" aria-label="Hapus lampiran" title="Hapus lampiran">' + xSVG + '</button>' +
+      '</div>';
+    });
+
+    if (!html) html = '<p class="edit-att-empty">Belum ada lampiran.</p>';
+    box.innerHTML = html;
+
+    $$('.edit-att-remove', box).forEach(btn => {
+      btn.addEventListener('click', () => {
+        const kind = btn.getAttribute('data-kind');
+        const idx = parseInt(btn.getAttribute('data-index'), 10);
+        if (kind === 'existing'){
+          if (editState.existing[idx]) editState.existing[idx].removed = true;
+        } else {
+          const f = editState.added[idx];
+          if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+          editState.added.splice(idx, 1);
+        }
+        renderEditAtts();
+      });
+    });
+  }
+
+  function openEditModal(owner, taskId){
+    const task = (state[owner] || []).find(t => t.id === taskId);
+    if (!task){ showToast('Tugas tidak ditemukan'); return; }
+
+    editState.owner = owner;
+    editState.taskId = taskId;
+    editState.saving = false;
+    editState.existing = (task.attachments || []).map(a => ({
+      id: a.id, name: a.name, type: a.type, size: a.size, removed: false
+    }));
+    editState.added = [];
+
+    editEls.text.value = task.text || '';
+    buildCourseOptions(owner, task.course || '');
+    editEls.deadline.value = task.deadline ? toDatetimeLocal(task.deadline) : '';
+    renderEditAtts();
+
+    editEls.modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { try { editEls.text.focus(); } catch(e){} }, 150);
+  }
+
+  function closeEditModal(){
+    if (!editEls.modal) return;
+    editEls.modal.classList.remove('open');
+    document.body.style.overflow = '';
+
+    editState.added.forEach(f => {
+      if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+    });
+    editState.added = [];
+    editState.existing = [];
+    editState.owner = null;
+    editState.taskId = null;
+    editState.saving = false;
+  }
+
+  function handleEditFiles(fileList){
+    const files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+
+    let currentCount = editState.existing.filter(a => !a.removed).length + editState.added.length;
+    let added = 0;
+    let skippedBig = 0;
+
+    files.forEach(file => {
+      if (currentCount >= MAX_FILES){
+        showToast('Maksimal ' + MAX_FILES + ' lampiran per tugas');
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE){ skippedBig++; return; }
+
+      const wrapped = {
+        file: file,
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size || 0,
+        _previewUrl: ''
+      };
+      if (isImageType(file.type, file.name)){
+        try { wrapped._previewUrl = URL.createObjectURL(file); } catch (e) {}
+      }
+      editState.added.push(wrapped);
+      currentCount++;
+      added++;
+    });
+
+    editEls.fileInput.value = '';
+
+    if (skippedBig > 0) showToast(skippedBig + ' file dilewati (maks 25 MB / file)');
+    if (added > 0) renderEditAtts();
+  }
+
+  async function saveEdit(){
+    if (editState.saving) return;
+    const owner = editState.owner;
+    const taskId = editState.taskId;
+    if (!owner || !taskId){ closeEditModal(); return; }
+
+    const task = (state[owner] || []).find(t => t.id === taskId);
+    if (!task){ closeEditModal(); return; }
+
+    const newText = (editEls.text.value || '').trim();
+    const newCourse = editEls.course.value;
+    const deadlineVal = editEls.deadline.value;
+
+    if (!newText){
+      showToast('Nama tugas tidak boleh kosong');
+      editEls.text.focus();
+      return;
+    }
+    if (!newCourse){
+      showToast('Pilih mata kuliah dulu ya');
+      return;
+    }
+
+    editState.saving = true;
+    const btn = editEls.saveBtn;
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan…';
+
+    const removed = editState.existing.filter(a => a.removed);
+    const kept = editState.existing.filter(a => !a.removed).map(a => ({
+      id: a.id, name: a.name, type: a.type, size: a.size
+    }));
+
+    // Upload file baru (paralel)
+    let newMetas = [];
+    if (editState.added.length){
+      newMetas = await Promise.all(editState.added.map(async (w) => {
+        try {
+          const att = await buildAttachment(w.file);
+          await saveAttachmentToFirestore(att);
+          attCache[owner][att.id] = {
+            id: att.id, name: att.name, type: att.type, size: att.size,
+            url: att.url, data: att.data
+          };
+          return { id: att.id, name: att.name, type: att.type, size: att.size };
+        } catch (err){
+          console.error('Edit attachment gagal:', w.name, err);
+          return {
+            id: newId('att_'),
+            name: w.name, type: w.type, size: w.size,
+            _failed: true, _error: (err && err.message) || 'Upload gagal'
+          };
+        }
+      }));
+    }
+
+    const finalAtts = kept.concat(newMetas);
+
+    const dl = deadlineVal ? new Date(deadlineVal).getTime() : null;
+    const newDeadline = (dl && !isNaN(dl)) ? dl : null;
+
+    // Update state lokal (optimistic)
+    task.text = newText;
+    task.course = newCourse;
+    task.deadline = newDeadline;
+    task.attachments = finalAtts;
+
+    // Bersihkan preview
+    editState.added.forEach(f => {
+      if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
+    });
+    editState.added = [];
+
+    render(owner);
+
+    // Persist ke Firestore
+    try {
+      await tasksCol(owner).doc(taskId).update({
+        text: newText,
+        course: newCourse,
+        deadline: newDeadline,
+        attachments: finalAtts.map(cleanAttMeta)
+      });
+    } catch (err){
+      console.error('Update task gagal:', err);
+      showToast('Gagal simpan perubahan ke server');
+    }
+
+    // Hapus attachment lama yang dibuang
+    removed.forEach(a => {
+      if (a && a.id){
+        delete attCache[owner][a.id];
+        deleteAttachmentFromFirestore(a.id);
+      }
+    });
+
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    editState.saving = false;
+
+    closeEditModal();
+    showToast('Tugas berhasil diperbarui');
+  }
+
+  if (editEls.closeBtn) editEls.closeBtn.addEventListener('click', closeEditModal);
+  if (editEls.cancelBtn) editEls.cancelBtn.addEventListener('click', closeEditModal);
+  if (editEls.saveBtn) editEls.saveBtn.addEventListener('click', saveEdit);
+  if (editEls.addFileBtn) editEls.addFileBtn.addEventListener('click', () => editEls.fileInput.click());
+  if (editEls.fileInput) {
+    editEls.fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files && files.length) handleEditFiles(files);
+    });
+  }
+  if (editEls.modal){
+    editEls.modal.addEventListener('click', (e) => {
+      if (e.target === editEls.modal) closeEditModal();
+    });
+  }
+  if (editEls.text){
+    editEls.text.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter'){ e.preventDefault(); saveEdit(); }
+    });
+  }
 
   /* TAB SWITCH */
   const tabSwitch = document.getElementById('tabSwitch');
@@ -2258,6 +2723,9 @@ body[data-mode="paanz"] .add-date::-webkit-calendar-picker-indicator { filter: i
       pendingFiles[owner].forEach(f => {
         if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
       });
+    });
+    editState.added.forEach(f => {
+      if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
     });
   });
 
