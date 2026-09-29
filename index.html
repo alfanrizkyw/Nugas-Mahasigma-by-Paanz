@@ -71,10 +71,18 @@ body[data-mode="paanz"] .bg-layer--paanz{opacity:1;}
 ::selection{background:var(--accent-soft);color:var(--ink);}
 button{font-family:inherit;}
 :focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px;}
+
+/* ==================== PAGE (main content) ==================== */
 .page{
   position:relative; z-index:1; width:100%; max-width:760px;
   margin:0 auto;
   padding:clamp(22px,5.5vw,52px) clamp(14px,4vw,24px) calc(72px + env(safe-area-inset-bottom));
+  opacity:0; visibility:hidden;
+  transition:opacity .9s var(--ease), visibility 0s linear .9s;
+}
+body.unlocked .page{
+  opacity:1; visibility:visible;
+  transition:opacity .9s var(--ease) .2s, visibility 0s;
 }
 .hero{display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:clamp(18px,4vw,28px);}
 
@@ -811,7 +819,7 @@ body[data-mode="paanz"] .modal-card{
 
 .toast{
   position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
-  transform:translate(-50%,16px); z-index:80;
+  transform:translate(-50%,16px); z-index:200;
   background:#241826; color:#fff; font-size:.82rem; font-weight:600;
   padding:11px 18px; border-radius:999px;
   box-shadow:0 14px 34px rgba(0,0,0,.35);
@@ -820,6 +828,432 @@ body[data-mode="paanz"] .modal-card{
   max-width:min(88vw,420px); text-align:center;
 }
 .toast.show{opacity:1; transform:translate(-50%,0);}
+
+/* ============================================================
+   LOGIN SCREEN — hitam gradasi putih + pink
+   ============================================================ */
+.login-screen{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px 20px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(255,105,160,.55), transparent 55%),
+    radial-gradient(circle at 86% 84%, rgba(255,182,206,.42), transparent 55%),
+    radial-gradient(circle at 78% 12%, rgba(232,85,138,.28), transparent 55%),
+    linear-gradient(135deg, #08080C 0%, #17171F 42%, #24242E 72%, #0C0C12 100%);
+  transition:opacity .65s var(--ease), visibility 0s linear .65s;
+}
+.login-screen::before,
+.login-screen::after{
+  content:''; position:absolute; border-radius:50%; pointer-events:none;
+  filter:blur(60px); opacity:.55;
+}
+.login-screen::before{
+  width:340px; height:340px; top:-90px; left:-90px;
+  background:radial-gradient(circle, #FF6FA5, transparent 70%);
+  animation:login-blob 14s ease-in-out infinite;
+}
+.login-screen::after{
+  width:400px; height:400px; bottom:-110px; right:-110px;
+  background:radial-gradient(circle, #FFB6CE, transparent 70%);
+  animation:login-blob 16s ease-in-out infinite reverse;
+}
+@keyframes login-blob{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%    { transform:translate(20px,-20px) scale(1.1); }
+}
+.login-screen.hidden{
+  opacity:0; visibility:hidden; pointer-events:none;
+}
+
+.login-card{
+  position:relative; z-index:1;
+  width:100%; max-width:380px;
+  padding:30px 26px 26px;
+  border-radius:30px;
+  background:
+    linear-gradient(150deg,
+      rgba(255,255,255,.10) 0%,
+      rgba(255,182,206,.08) 45%,
+      rgba(255,105,160,.12) 100%);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(22px) saturate(1.4);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:
+    0 30px 70px -22px rgba(0,0,0,.75),
+    0 12px 32px -14px rgba(255,105,160,.35),
+    inset 0 1px 0 rgba(255,255,255,.20);
+  text-align:center;
+  animation:login-card-in .85s var(--ease) both;
+}
+@keyframes login-card-in{
+  0%  { opacity:0; transform:translateY(22px) scale(.96); }
+  100%{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Cat di login */
+.login-cat-stage{
+  position:relative;
+  width:96px; height:88px;
+  margin:0 auto 4px;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.login-cat-float{
+  position:absolute; inset:0;
+  animation:login-cat-float 4s ease-in-out infinite;
+}
+@keyframes login-cat-float{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  50%    { transform:translateY(-4px) rotate(-1.5deg); }
+}
+.login-cat{
+  width:100%; height:100%; overflow:visible;
+  --cat-fill:#FFFFFF;
+  --cat-line:#FF8FB8;
+  --cat-eye:#1A1A22;
+  --cat-nose:#E8558A;
+  --cat-blush:#FFB6CE;
+  filter:drop-shadow(0 8px 16px rgba(255,105,160,.45));
+}
+.login-cat .cat__body,
+.login-cat .cat__face,
+.login-cat .cat__ear{
+  fill:var(--cat-fill); stroke:var(--cat-line); stroke-width:2; stroke-linejoin:round;
+}
+.login-cat .cat__tail{ fill:none; stroke:var(--cat-fill); stroke-width:11; stroke-linecap:round; }
+.login-cat .cat__paw{ fill:var(--cat-fill); stroke:var(--cat-line); stroke-width:2; }
+.login-cat .cat__eye{ fill:var(--cat-eye); }
+.login-cat .cat__nose{ fill:var(--cat-nose); }
+.login-cat .cat__blush{ fill:var(--cat-blush); opacity:.55; }
+.login-cat .cat__mouth,
+.login-cat .cat__whiskers path{ fill:none; stroke:var(--cat-line); stroke-width:1.7; stroke-linecap:round; }
+.login-cat .cat__eye-line{ fill:none; stroke:var(--cat-eye); stroke-width:2.6; stroke-linecap:round; }
+.login-cat .cat__tail{ transform-box:fill-box; transform-origin:0% 100%; animation:cat-tail 3.2s ease-in-out infinite; }
+.login-cat .cat__body{ transform-box:fill-box; transform-origin:center bottom; animation:cat-breathe 3.6s ease-in-out infinite; }
+.login-cat .cat__head{ transform-box:fill-box; transform-origin:center bottom; animation:cat-head 3.6s ease-in-out infinite; }
+
+/* Eye states: default = open (pw hidden). Kalau pw ditampilkan → closed */
+.login-cat .cat__eyes--closed{ display:none; }
+.login-cat-stage.eyes-closed .cat__eyes--open{ display:none; }
+.login-cat-stage.eyes-closed .cat__eyes--closed{ display:block; }
+.login-cat-stage.eyes-closed .login-cat-float{
+  animation:login-cat-sly 2.6s ease-in-out infinite;
+}
+@keyframes login-cat-sly{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  50%    { transform:translateY(-2px) rotate(2deg); }
+}
+
+.login-title{
+  font-family:var(--font-display); font-weight:700;
+  font-size:clamp(1.5rem,5.5vw,1.85rem);
+  line-height:1.1; letter-spacing:-.02em;
+  margin:8px 0 22px;
+  background:linear-gradient(120deg, #FFFFFF 0%, #FFE1EE 45%, #FF8FB8 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+
+.login-field{
+  position:relative;
+  display:flex; align-items:center;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(255,255,255,.14);
+  border-radius:15px;
+  margin-bottom:14px;
+  transition:border-color .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.login-field:focus-within{
+  border-color:#FF8FB8;
+  background:rgba(255,255,255,.10);
+  box-shadow:0 0 0 4px rgba(255,143,184,.20);
+}
+.login-field input{
+  flex:1; min-width:0;
+  border:none; background:transparent; outline:none;
+  padding:15px 8px 15px 16px;
+  font-family:inherit; font-size:.98rem; font-weight:500;
+  color:#FFFFFF;
+  letter-spacing:.02em;
+}
+.login-field input::placeholder{
+  color:rgba(255,255,255,.40); font-weight:500;
+}
+.pw-toggle{
+  flex-shrink:0;
+  width:46px; height:46px; margin-right:2px;
+  border:none; background:transparent;
+  color:rgba(255,255,255,.55);
+  cursor:pointer; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  transition:color .2s ease, background .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.pw-toggle:hover{ color:#FF8FB8; background:rgba(255,255,255,.08); }
+.pw-toggle:active{ transform:scale(.9); }
+.pw-toggle svg{ width:20px; height:20px; }
+.pw-toggle .pw-eye-off{ display:none; }
+.login-field.showing .pw-toggle .pw-eye-on{ display:none; }
+.login-field.showing .pw-toggle .pw-eye-off{ display:block; }
+
+.login-btn{
+  width:100%;
+  border:none; cursor:pointer;
+  padding:15px 22px;
+  border-radius:15px;
+  font-family:inherit; font-weight:800; font-size:.98rem;
+  color:#fff; letter-spacing:.01em;
+  background:linear-gradient(120deg, #FF6FA5 0%, #E8558A 50%, #FF8FB8 100%);
+  box-shadow:
+    0 16px 34px -14px rgba(255,105,160,.75),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s ease, filter .18s ease, box-shadow .25s ease;
+  -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.login-btn svg{ width:18px; height:18px; }
+.login-btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+.login-btn:active{ transform:translateY(0) scale(.98); }
+.login-btn:disabled{ opacity:.7; cursor:wait; transform:none; }
+
+.login-error{
+  min-height:20px;
+  margin-top:12px;
+  font-size:.82rem; font-weight:600;
+  color:#FF8FB8;
+  opacity:0;
+  transform:translateY(-4px);
+  transition:opacity .28s ease, transform .28s ease;
+}
+.login-error.show{ opacity:1; transform:translateY(0); }
+.login-error.shake{
+  animation:login-shake .42s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes login-shake{
+  10%,90%{ transform:translateX(-2px); }
+  20%,80%{ transform:translateX(4px); }
+  30%,50%,70%{ transform:translateX(-6px); }
+  40%,60%{ transform:translateX(6px); }
+}
+
+/* ============================================================
+   INTRO SCREEN — kucing makan ikan
+   ============================================================ */
+.intro-screen{
+  position:fixed; inset:0; z-index:90;
+  display:none;
+  align-items:center; justify-content:center;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 30% 42%, rgba(255,105,160,.18), transparent 55%),
+    radial-gradient(circle at 74% 72%, rgba(255,182,206,.14), transparent 55%),
+    linear-gradient(160deg, #06060A 0%, #131320 50%, #1D1D28 100%);
+  opacity:1;
+  transition:opacity .7s var(--ease);
+}
+.intro-screen.active{ display:flex; }
+.intro-screen.fading{ opacity:0; }
+
+.intro-stars,
+.intro-stars::before,
+.intro-stars::after{
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 22%, rgba(255,255,255,.75), transparent 60%),
+    radial-gradient(1.2px 1.2px at 42% 68%, rgba(255,214,231,.6), transparent 60%),
+    radial-gradient(1.6px 1.6px at 76% 32%, rgba(255,255,255,.65), transparent 60%),
+    radial-gradient(1.2px 1.2px at 88% 78%, rgba(255,182,206,.6), transparent 60%),
+    radial-gradient(1.1px 1.1px at 30% 88%, rgba(255,255,255,.5), transparent 60%);
+  background-size:100% 100%;
+  opacity:.7;
+}
+.intro-stars::before{
+  content:''; background-position:30% 30%;
+  animation:intro-twinkle 5s ease-in-out infinite;
+}
+.intro-stars::after{
+  content:''; background-position:60% 60%;
+  animation:intro-twinkle 7s ease-in-out infinite reverse;
+}
+@keyframes intro-twinkle{
+  0%,100%{ opacity:.35; }
+  50%    { opacity:.9; }
+}
+
+.intro-stage{
+  position:absolute;
+  left:0; right:0;
+  top:50%;
+  transform:translateY(-50%);
+  height:180px;
+  pointer-events:none;
+}
+
+/* ground line */
+.intro-ground{
+  position:absolute;
+  left:0; right:0;
+  bottom:20px;
+  height:1.5px;
+  background:linear-gradient(90deg, transparent, rgba(255,143,184,.42) 22%, rgba(255,255,255,.35) 50%, rgba(255,143,184,.42) 78%, transparent);
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.intro-screen.active .intro-ground{ opacity:1; }
+
+/* scene: kucing + ikan duduk di ground */
+.intro-scene{
+  position:absolute;
+  left:50%; bottom:20px;
+  transform:translateX(-50%);
+  display:flex; align-items:flex-end; gap:clamp(8px,2.5vw,22px);
+  will-change:transform;
+}
+
+/* wrapper yang menggerakkan kucing dari kiri ke ikan */
+.intro-cat-wrap{
+  position:relative;
+  width:170px; height:104px;
+  transform:translateX(-75vw);
+  animation:intro-cat-approach 2.2s cubic-bezier(.45,.05,.35,1) .15s forwards;
+}
+@keyframes intro-cat-approach{
+  0%   { transform:translateX(-75vw); }
+  100% { transform:translateX(0); }
+}
+
+/* bounce saat lari (berhenti setelah 6 pantulan) */
+.intro-cat-bounce{
+  position:absolute; inset:0;
+  animation:intro-bounce .38s ease-in-out .15s 6;
+}
+@keyframes intro-bounce{
+  0%,100%{ transform:translateY(0); }
+  50%    { transform:translateY(-7px); }
+}
+
+/* chomp (menggigit) setelah sampai di ikan */
+.intro-cat-chomp{
+  width:100%; height:100%;
+  transform-origin:50% 92%;
+  animation:intro-chomp .42s ease-in-out 2.4s 2;
+}
+@keyframes intro-chomp{
+  0%,100%{ transform:rotate(0deg) translateY(0); }
+  45%    { transform:rotate(7deg) translateY(2px); }
+  70%    { transform:rotate(1deg) translateY(0); }
+}
+
+/* fish wrap: goyang halus, lalu "dimakan" (menyusut & hilang) */
+.intro-fish-wrap{
+  position:relative;
+  width:88px; height:54px;
+  margin-bottom:-4px;
+  animation:intro-fish-idle .9s ease-in-out infinite,
+            intro-fish-eaten .6s ease-in 2.55s forwards;
+}
+@keyframes intro-fish-idle{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  50%    { transform:translateY(-3px) rotate(-2deg); }
+}
+@keyframes intro-fish-eaten{
+  0%   { transform:scale(1) translateY(0); opacity:1; }
+  35%  { transform:scale(1.14) translateY(-3px); opacity:1; }
+  100% { transform:scale(0) translateY(4px); opacity:0; }
+}
+
+/* ==== SVG Kucing lari (profil) ==== */
+.run-cat{
+  width:100%; height:100%; overflow:visible;
+  --rc-fill:#FFFFFF;
+  --rc-line:#FF8FB8;
+  --rc-eye:#1A1A22;
+  --rc-nose:#E8558A;
+  filter:drop-shadow(0 10px 22px rgba(255,105,160,.45));
+}
+.run-cat .rc__body,
+.run-cat .rc__head,
+.run-cat .rc__ear{ fill:var(--rc-fill); stroke:var(--rc-line); stroke-width:2; stroke-linejoin:round; }
+.run-cat .rc__tail{ fill:none; stroke:var(--rc-fill); stroke-width:10; stroke-linecap:round; }
+.run-cat .rc__leg{ fill:var(--rc-fill); stroke:var(--rc-line); stroke-width:2; }
+.run-cat .rc__eye{ fill:var(--rc-eye); }
+.run-cat .rc__nose{ fill:var(--rc-nose); }
+.run-cat .rc__mouth{ fill:none; stroke:var(--rc-line); stroke-width:1.6; stroke-linecap:round; }
+.run-cat .rc__blush{ fill:#FFB6CE; opacity:.6; }
+
+.run-cat .rc__tail{
+  transform-box:fill-box; transform-origin:0% 50%;
+  animation:rc-tail 0.55s ease-in-out infinite;
+}
+@keyframes rc-tail{
+  0%,100%{ transform:rotate(-6deg); }
+  50%    { transform:rotate(6deg); }
+}
+
+/* leg groups: masing-masing mengayun */
+.run-cat .rc__leg-group{
+  transform-box:fill-box;
+  transform-origin:top center;
+  animation:rc-leg .38s ease-in-out infinite;
+}
+.run-cat .rc__leg-group.l2{ animation-delay:.19s; }
+.run-cat .rc__leg-group.l3{ animation-delay:.095s; }
+.run-cat .rc__leg-group.l4{ animation-delay:.285s; }
+@keyframes rc-leg{
+  0%,100%{ transform:rotate(20deg); }
+  50%    { transform:rotate(-20deg); }
+}
+
+/* ==== SVG Ikan ==== */
+.run-fish{
+  width:100%; height:100%; overflow:visible;
+  filter:drop-shadow(0 6px 16px rgba(255,105,160,.55));
+}
+.run-fish .rf__body{ fill:#FFB6CE; stroke:#E8558A; stroke-width:1.6; }
+.run-fish .rf__fin{ fill:#E8558A; opacity:.85; }
+.run-fish .rf__tail{
+  fill:#E8558A;
+  transform-box:fill-box; transform-origin:100% 50%;
+  animation:rf-tail .28s ease-in-out infinite;
+}
+@keyframes rf-tail{
+  0%,100%{ transform:rotate(-14deg) scaleX(1); }
+  50%    { transform:rotate(14deg) scaleX(.88); }
+}
+.run-fish .rf__eye{ fill:#1A1A22; }
+.run-fish .rf__bubble{
+  fill:none; stroke:rgba(255,255,255,.6); stroke-width:1.2;
+  animation:rf-bubble 1.6s ease-in-out infinite;
+}
+@keyframes rf-bubble{
+  0%  { opacity:0; transform:translate(0,0); }
+  40% { opacity:.8; }
+  100%{ opacity:0; transform:translate(4px,-12px); }
+}
+
+.intro-welcome{
+  position:absolute;
+  left:50%; top:calc(50% + 130px);
+  transform:translate(-50%, 12px);
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(1rem,3.2vw,1.25rem);
+  letter-spacing:.06em;
+  color:rgba(255,255,255,.92);
+  opacity:0;
+  transition:opacity .7s var(--ease), transform .7s var(--ease);
+  text-shadow:0 4px 24px rgba(255,105,160,.55);
+  white-space:nowrap;
+}
+.intro-welcome span{
+  background:linear-gradient(120deg,#FFB6CE 0%, #FFFFFF 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+.intro-screen.active .intro-welcome{
+  opacity:1; transform:translate(-50%, 0);
+  transition-delay:1.6s;
+}
 
 @media (max-width:480px){
   .add-row-main{flex-wrap:wrap;}
@@ -831,6 +1265,8 @@ body[data-mode="paanz"] .modal-card{
   .attach-name{max-width:16ch;}
   .modal-foot{flex-direction:column-reverse;}
   .modal-btn{width:100%;}
+  .intro-cat-wrap{ width:140px; height:88px; }
+  .intro-fish-wrap{ width:72px; height:44px; }
 }
 @media (max-width:400px){
   .tab-switch{--tab-pad:4px;}
@@ -841,6 +1277,8 @@ body[data-mode="paanz"] .modal-card{
   .task-item{gap:9px; padding:10px;}
   .delete-btn,.edit-btn{width:36px; height:36px;}
   .course-chip{padding:7px 11px; font-size:.74rem;}
+  .login-card{padding:24px 18px 20px;}
+  .login-cat-stage{width:80px; height:74px;}
 }
 @media (min-width:900px){ .page{max-width:800px;} }
 @media (prefers-reduced-motion:reduce){
@@ -850,6 +1288,142 @@ body[data-mode="paanz"] .modal-card{
 </head>
 <body data-mode="myla">
 
+<!-- ============================================================
+     LOGIN SCREEN
+     ============================================================ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-cat-stage" id="loginCatStage" aria-hidden="true">
+      <div class="login-cat-float">
+        <svg class="login-cat" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+          <path class="cat__tail" d="M96 96 C 122 100, 132 76, 114 56"/>
+          <ellipse class="cat__body" cx="66" cy="88" rx="29" ry="25"/>
+          <ellipse class="cat__paw" cx="52" cy="110" rx="11" ry="7"/>
+          <ellipse class="cat__paw" cx="80" cy="110" rx="11" ry="7"/>
+          <g class="cat__head">
+            <path class="cat__ear" d="M45 34 L41 12 L64 26 Z"/>
+            <path class="cat__ear" d="M87 34 L91 12 L68 26 Z"/>
+            <circle class="cat__face" cx="66" cy="48" r="26"/>
+
+            <!-- Eyes OPEN (default, saat password disembunyikan) -->
+            <g class="cat__eyes cat__eyes--open">
+              <ellipse class="cat__eye" cx="55" cy="47" rx="3.6" ry="5"/>
+              <ellipse class="cat__eye" cx="77" cy="47" rx="3.6" ry="5"/>
+              <circle cx="56.5" cy="45" r="1.1" fill="rgba(255,255,255,.9)"/>
+              <circle cx="78.5" cy="45" r="1.1" fill="rgba(255,255,255,.9)"/>
+            </g>
+
+            <!-- Eyes CLOSED (saat password ditampilkan) -->
+            <g class="cat__eyes cat__eyes--closed">
+              <path class="cat__eye-line" d="M49 47 Q55 52 61 47"/>
+              <path class="cat__eye-line" d="M71 47 Q77 52 83 47"/>
+            </g>
+
+            <ellipse class="cat__blush" cx="47" cy="57" rx="5" ry="3"/>
+            <ellipse class="cat__blush" cx="85" cy="57" rx="5" ry="3"/>
+            <path class="cat__nose" d="M62.4 54.6h7.2l-3.6 3.8z"/>
+            <path class="cat__mouth" d="M66 58.4v2.6"/>
+            <path class="cat__mouth" d="M66 61q-3.6 3.4-7 .6"/>
+            <path class="cat__mouth" d="M66 61q3.6 3.4 7 .6"/>
+            <g class="cat__whiskers">
+              <path d="M42 52 L26 48"/><path d="M42 57 L26 60"/>
+              <path d="M90 52 L106 48"/><path d="M90 57 L106 60"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="login-title">Nugas Mahasigma</h1>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="login-field" id="loginField">
+        <input type="password" id="loginPassword" placeholder="Password"
+               autocomplete="current-password" spellcheck="false" autocapitalize="off">
+        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Tampilkan password" title="Tampilkan / sembunyikan password">
+          <svg class="pw-eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+            <path d="M1 1l22 22"/>
+          </svg>
+        </button>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        Masuk
+      </button>
+    </form>
+
+    <div class="login-error" id="loginError" role="alert"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     INTRO SCREEN — kucing makan ikan
+     ============================================================ -->
+<div class="intro-screen" id="introScreen" aria-hidden="true">
+  <div class="intro-stars"></div>
+  <div class="intro-stage">
+    <div class="intro-ground"></div>
+    <div class="intro-scene">
+      <!-- Kucing: lari dari kiri, berhenti di ikan, lalu menggigit -->
+      <div class="intro-cat-wrap">
+        <div class="intro-cat-bounce">
+          <div class="intro-cat-chomp">
+            <svg class="run-cat" viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
+              <path class="rc__tail" d="M34 62 Q 8 58 10 28 Q 12 16 22 20"/>
+              <ellipse class="rc__body" cx="92" cy="62" rx="50" ry="25"/>
+              <g class="rc__leg-group l1">
+                <rect class="rc__leg" x="56" y="80" width="8" height="24" rx="4"/>
+              </g>
+              <g class="rc__leg-group l2">
+                <rect class="rc__leg" x="76" y="80" width="8" height="24" rx="4"/>
+              </g>
+              <g class="rc__leg-group l3">
+                <rect class="rc__leg" x="104" y="80" width="8" height="24" rx="4"/>
+              </g>
+              <g class="rc__leg-group l4">
+                <rect class="rc__leg" x="124" y="80" width="8" height="24" rx="4"/>
+              </g>
+              <circle class="rc__head" cx="144" cy="48" r="24"/>
+              <path class="rc__ear" d="M128 30 L126 10 L146 26 Z"/>
+              <path class="rc__ear" d="M150 26 L166 12 L162 32 Z"/>
+              <ellipse class="rc__eye" cx="154" cy="46" rx="3.4" ry="5"/>
+              <circle cx="155" cy="44" r="1" fill="#fff"/>
+              <ellipse class="rc__blush" cx="148" cy="56" rx="4" ry="2.6"/>
+              <circle class="rc__nose" cx="166" cy="53" r="2.4"/>
+              <path class="rc__mouth" d="M166 55 q-3 3 -6 1"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ikan: di depan kucing, jadi santapan -->
+      <div class="intro-fish-wrap">
+        <svg class="run-fish" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+          <path class="rf__tail" d="M18 30 L0 14 L0 46 Z"/>
+          <ellipse class="rf__body" cx="52" cy="30" rx="30" ry="17"/>
+          <path class="rf__fin" d="M46 14 Q52 4 60 14 Z"/>
+          <path class="rf__fin" d="M46 46 Q52 56 60 46 Z"/>
+          <circle class="rf__eye" cx="68" cy="26" r="2.6"/>
+          <circle cx="68.8" cy="25.4" r=".8" fill="#fff"/>
+          <path class="rf__mouth" d="M79 30 q2 2 -1 3" fill="none" stroke="#C43E70" stroke-width="1.4" stroke-linecap="round"/>
+          <circle class="rf__bubble" cx="86" cy="22" r="3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="intro-welcome">Selamat datang, <span>sayang</span></div>
+</div>
+
+<!-- ============================================================
+     MAIN APP
+     ============================================================ -->
 <div class="bg-layer bg-layer--myla"></div>
 <div class="bg-layer bg-layer--paanz"></div>
 
@@ -1231,6 +1805,130 @@ body[data-mode="paanz"] .modal-card{
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+/* ============================================================
+   LOGIN + INTRO (dijalankan paling awal)
+   ============================================================ */
+(function(){
+  'use strict';
+
+  // -----------------------------------------------------------------
+  // Password "sayanggg" disimpan TER-OBFUSCATE (XOR)
+  // -----------------------------------------------------------------
+  var _pk = 0x5A;
+  var _pe = [41, 59, 35, 59, 52, 61, 61, 61]; // XOR'd "sayanggg"
+  function _decode(){
+    var s = '';
+    for (var i = 0; i < _pe.length; i++) s += String.fromCharCode(_pe[i] ^ _pk);
+    return s;
+  }
+  function checkPassword(input){
+    try { return String(input) === _decode(); }
+    catch(e){ return false; }
+  }
+
+  var loginScreen = document.getElementById('loginScreen');
+  var loginForm   = document.getElementById('loginForm');
+  var loginField  = document.getElementById('loginField');
+  var loginInput  = document.getElementById('loginPassword');
+  var loginBtn    = document.getElementById('loginBtn');
+  var loginErr    = document.getElementById('loginError');
+  var pwToggle    = document.getElementById('pwToggle');
+  var catStage    = document.getElementById('loginCatStage');
+  var introScreen = document.getElementById('introScreen');
+
+  var SESSION_KEY = 'nugas_auth_v1';
+  var isSubmitting = false;
+
+  pwToggle.addEventListener('click', function(){
+    var show = loginInput.type === 'password';
+    loginInput.type = show ? 'text' : 'password';
+    loginField.classList.toggle('showing', show);
+    catStage.classList.toggle('eyes-closed', show);
+    pwToggle.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+    try { loginInput.focus(); } catch(e){}
+  });
+
+  try { loginInput.focus(); } catch(e){}
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (isSubmitting) return;
+    var val = loginInput.value;
+    if (!val){
+      showLoginError('Password-nya belum diisi ya');
+      return;
+    }
+    isSubmitting = true;
+    loginBtn.disabled = true;
+    var original = loginBtn.innerHTML;
+    loginBtn.innerHTML = 'Sebentar ya...';
+
+    setTimeout(function(){
+      if (checkPassword(val)){
+        loginErr.classList.remove('show','shake');
+        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch(err){}
+        loginBtn.innerHTML = original;
+        startIntro();
+      } else {
+        isSubmitting = false;
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = original;
+        showLoginError('Password-nya salah, coba lagi ya');
+        loginInput.select();
+      }
+    }, 420);
+  });
+
+  function showLoginError(msg){
+    loginErr.textContent = msg;
+    loginErr.classList.add('show','shake');
+    setTimeout(function(){ loginErr.classList.remove('shake'); }, 480);
+  }
+
+  var alreadyAuth = false;
+  try { alreadyAuth = sessionStorage.getItem(SESSION_KEY) === '1'; } catch(e){}
+  if (alreadyAuth){
+    loginScreen.classList.add('hidden');
+    document.body.classList.add('unlocked');
+  }
+
+  // ============================================================
+  // INTRO ANIMASI: kucing mengejar ikan, lalu memakannya
+  // ============================================================
+  var introTimers = [];
+
+  function startIntro(){
+    loginScreen.classList.add('hidden');
+
+    introScreen.classList.add('active');
+    void introScreen.offsetWidth;
+
+    // 3.7s: habis fase lari + makan → fade-out intro & munculkan page
+    introTimers.push(setTimeout(function(){
+      introScreen.classList.add('fading');
+      document.body.classList.add('unlocked');
+
+      introTimers.push(setTimeout(function(){
+        introScreen.classList.remove('active','fading');
+      }, 750));
+    }, 3700));
+  }
+
+  window.addEventListener('beforeunload', function(){
+    introTimers.forEach(function(t){ clearTimeout(t); });
+  });
+
+  if (alreadyAuth){
+    catStage.classList.remove('eyes-closed');
+  }
+
+})();
+</script>
+
+<script>
+/* ============================================================
+   APP LOGIC (Firebase, tugas, dll)
+   ============================================================ */
 (function(){
   'use strict';
 
@@ -1255,9 +1953,8 @@ body[data-mode="paanz"] .modal-card{
   const MAX_FILE_SIZE = 25 * 1024 * 1024;
   const LS_PREFIX = 'nugas_mahasigma_v4_';
 
-  // Batas aman per-doc Firestore: 1 MiB. Base64 = ~1.37x raw. Ambil 500KB base64 biar aman.
   const ATT_DOC_LIMIT = 500 * 1024;
-  const CHUNK_SIZE = 400 * 1024; // chars per chunk doc
+  const CHUNK_SIZE = 400 * 1024;
 
   const state = { paan: [], myla: [] };
   const activeFilter = { paan: 'active', myla: 'active' };
@@ -1268,9 +1965,8 @@ body[data-mode="paanz"] .modal-card{
   const prevTabCounts = { paan: null, myla: null };
   const prevBallCount = { paan: null, myla: null };
 
-  // Cache att data (loaded from attachments collection)
-  const attCache = { paan: {}, myla: {} };     // [owner][attId] = { id, name, type, size, url?, data? }
-  const attLoading = { paan: {}, myla: {} };   // [owner][attId] = true kalau sedang load
+  const attCache = { paan: {}, myla: {} };
+  const attLoading = { paan: {}, myla: {} };
 
   const els = {
     paan: {
@@ -1450,8 +2146,6 @@ body[data-mode="paanz"] .modal-card{
     }
     prevBallCount[owner] = pending;
   }
-
-  // ===== ATTACHMENT STORAGE (koleksi `attachments/{id}` + chunk di subcollection) =====
 
   async function saveAttachmentToFirestore(att){
     const ref = attsCol().doc(att.id);
@@ -1943,7 +2637,7 @@ body[data-mode="paanz"] .modal-card{
           const d = await compressImageToDataURL(file, a.dim, a.q);
           data = d;
           if (d.length < 300 * 1024) break;
-        } catch (e){ /* coba attempt berikutnya */ }
+        } catch (e){ }
       }
       if (!data) throw new Error('Gambar tidak bisa diproses');
       return Object.assign(baseMeta, { data: data, _kind: 'data' });
@@ -2347,8 +3041,6 @@ body[data-mode="paanz"] .modal-card{
     });
   });
 
-  /* =================== EDIT MODAL LOGIC =================== */
-
   const editEls = {
     modal: document.getElementById('editModal'),
     card: document.getElementById('editCard'),
@@ -2366,8 +3058,8 @@ body[data-mode="paanz"] .modal-card{
   const editState = {
     owner: null,
     taskId: null,
-    existing: [],   // { id, name, type, size, removed }
-    added: [],      // { file, name, type, size, _previewUrl }
+    existing: [],
+    added: [],
     saving: false
   };
 
@@ -2551,7 +3243,6 @@ body[data-mode="paanz"] .modal-card{
       id: a.id, name: a.name, type: a.type, size: a.size
     }));
 
-    // Upload file baru (paralel)
     let newMetas = [];
     if (editState.added.length){
       newMetas = await Promise.all(editState.added.map(async (w) => {
@@ -2579,13 +3270,11 @@ body[data-mode="paanz"] .modal-card{
     const dl = deadlineVal ? new Date(deadlineVal).getTime() : null;
     const newDeadline = (dl && !isNaN(dl)) ? dl : null;
 
-    // Update state lokal (optimistic)
     task.text = newText;
     task.course = newCourse;
     task.deadline = newDeadline;
     task.attachments = finalAtts;
 
-    // Bersihkan preview
     editState.added.forEach(f => {
       if (f && f._previewUrl){ try { URL.revokeObjectURL(f._previewUrl); } catch (e) {} }
     });
@@ -2593,7 +3282,6 @@ body[data-mode="paanz"] .modal-card{
 
     render(owner);
 
-    // Persist ke Firestore
     try {
       await tasksCol(owner).doc(taskId).update({
         text: newText,
@@ -2606,7 +3294,6 @@ body[data-mode="paanz"] .modal-card{
       showToast('Gagal simpan perubahan ke server');
     }
 
-    // Hapus attachment lama yang dibuang
     removed.forEach(a => {
       if (a && a.id){
         delete attCache[owner][a.id];
@@ -2643,7 +3330,6 @@ body[data-mode="paanz"] .modal-card{
     });
   }
 
-  /* TAB SWITCH */
   const tabSwitch = document.getElementById('tabSwitch');
   const board = document.getElementById('board');
   const tabButtons = $$('.tab-btn', tabSwitch);
@@ -2692,7 +3378,6 @@ body[data-mode="paanz"] .modal-card{
   setActiveTab('paan');
   setTimeout(updateThumb, 120);
 
-  /* MOTIVATION */
   const motivationLines = [
     'Real-time sync otomatis antar perangkat via Firebase Firestore.',
     'Skripsi tidak akan selesai sendiri, tapi satu tugas selesai hari ini sudah kemajuan.',
